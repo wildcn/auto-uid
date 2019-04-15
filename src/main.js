@@ -6,35 +6,30 @@ const path = require('path');
 const shell = require( 'shelljs' );
 const get_args = require('./utils/get_args.js');
 
-let osInfo = shell.exec( 'cat /etc/os-release', { silent: true } );
-let osName = '';
-/ubuntu/i.test( osInfo ) && ( osName = 'Ubuntu' );
-/centos/i.test( osInfo ) && ( osName = 'Centos' );
-
-if( !osName ){	
-	console.log( '不支持的系统' );
-	process.exit( 0 );
-}
 
 const APP_ROOT = path.resolve(__dirname, '..');
 let PROJECT_ROOT = process.env.PWD;
 
-let args = get_args(process);
-let cityName = '';
-if( args.length ) {
-    if( /\//.test( args[0] ) ){
-        PROJECT_ROOT = path.resolve( args[0] );
-    }else if( cityName = args[0].trim() ){
-        console.log( cityName );
-    }
-}
+const packJSON = require( `${APP_ROOT}/package.json` );
+const config = require( `${APP_ROOT}/config.json` );
 
-const pack = fs.readFileSync( `${APP_ROOT}/package.json`, 'utf8' );
-const packJSON = JSON.parse( pack );
+/*
+console.log( APP_ROOT );
+console.log( PROJECT_ROOT );
+console.dir( config );
+*/
 
-//process.exit( 0 );
+var program = require('commander');
+
+program
+  .version( config.version, '-v, --version' )
+  .option('-p, --peppers', 'Add peppers')
+  .option('-P, --pineapple', 'Add pineapple')
+  .option('-b, --bbq-sauce', 'Add bbq sauce')
+  .option('-c, --cheese [type]', 'Add the specified type of cheese [marble]', 'marble')
+  .parse(process.argv);
 
 require('babel-core/register');
 require("babel-polyfill");
 const init = require( './app' ).init;
-init( APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName );
+//init( APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName );
