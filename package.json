@@ -1,7 +1,7 @@
 {
   "name": "feuid",
-  "version": "1.0.8",
-  "description": ".shp and .kml to .pbf",
+  "version": "1.0.0",
+  "description": "frontend unique id",
   "main": "src/main.js",
   "bin": {
     "feuid": "bin/main.js"
