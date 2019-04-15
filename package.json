@@ -1,10 +1,10 @@
 {
-  "name": "shp2pbf",
+  "name": "feuid",
   "version": "1.0.8",
   "description": ".shp and .kml to .pbf",
   "main": "src/main.js",
   "bin": {
-    "shp2pbf": "bin/main.js"
+    "feuid": "bin/main.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,10 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/openjavascript/shp2pbf.git"
+    "url": "git+https://github.com/hnjd-fe/feuid.git"
   },
   "keywords": [
-    "shp2pbf",
+    "feuid",
     "env",
     "init",
     "node",
@@ -26,9 +26,9 @@
   "author": "suches <908202921@qq.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/openjavascript/shp2pbf/issues"
+    "url": "https://github.com/hnjd-fe/feuid/issues"
   },
-  "homepage": "https://github.com/openjavascript/shp2pbf#readme",
+  "homepage": "https://github.com/hnjd-fe/feuid#readme",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
