@@ -5,7 +5,6 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var shell = require('shelljs');
-var get_args = require('./utils/get_args.js');
 
 var APP_ROOT = path.resolve(__dirname, '..');
 var PROJECT_ROOT = process.env.PWD;
@@ -13,17 +12,14 @@ var PROJECT_ROOT = process.env.PWD;
 var packJSON = require(APP_ROOT + '/package.json');
 var config = require(APP_ROOT + '/config.json');
 
-/*
-console.log( APP_ROOT );
-console.log( PROJECT_ROOT );
-console.dir( config );
-*/
-
 var program = require('commander');
 
-program.version(config.version, '-v, --version')
-//.option('-b, --bbq-sauce', 'Add bbq sauce')
-.parse(process.argv);
+program.version(config.version).option('-p, --path <path>', '设置项目路径');
+program.parse(process.argv);
+
+PROJECT_ROOT = program.path || PROJECT_ROOT;
+
+console.log(PROJECT_ROOT);
 
 require('babel-core/register');
 require("babel-polyfill");

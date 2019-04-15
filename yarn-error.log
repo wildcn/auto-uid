@@ -1,0 +1,84 @@
+Arguments: 
+  /usr/bin/node /usr/share/yarn/bin/yarn.js
+
+PATH: 
+  /home/suches/bin:/home/suches/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+Yarn version: 
+  1.12.3
+
+Node version: 
+  8.14.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: https://af-biz.360es.cn/artifactory/api/npm/ats-npm/babel-cli: tunneling socket could not be established, cause=getaddrinfo ENOTFOUND proxy.lfk.360es.cn proxy.lfk.360es.cn:3128
+      at ClientRequest.onError (/usr/share/yarn/lib/cli.js:140504:17)
+      at Object.onceWrapper (events.js:315:30)
+      at emitOne (events.js:116:13)
+      at ClientRequest.emit (events.js:211:7)
+      at Socket.socketErrorListener (_http_client.js:401:9)
+      at emitOne (events.js:116:13)
+      at Socket.emit (events.js:211:7)
+      at emitErrorNT (internal/streams/destroy.js:66:8)
+      at _combinedTickCallback (internal/process/next_tick.js:139:11)
+      at process._tickCallback (internal/process/next_tick.js:181:9)
+
+npm manifest: 
+  {
+    "name": "shp2pbf",
+    "version": "1.0.8",
+    "description": ".shp and .kml to .pbf",
+    "main": "src/main.js",
+    "bin": {
+      "shp2pbf": "bin/main.js"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "babel -w src/ -d bin/",
+      "public": "babel src/ -d bin/"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/openjavascript/shp2pbf.git"
+    },
+    "keywords": [
+      "shp2pbf",
+      "env",
+      "init",
+      "node",
+      "javascript",
+      "suches"
+    ],
+    "author": "suches <908202921@qq.com>",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/openjavascript/shp2pbf/issues"
+    },
+    "homepage": "https://github.com/openjavascript/shp2pbf#readme",
+    "dependencies": {
+      "babel-cli": "^6.26.0",
+      "babel-core": "^6.26.3",
+      "babel-polyfill": "^6.26.0",
+      "babel-preset-env": "^1.7.0",
+      "chalk": "^2.4.1",
+      "clear": "^0.1.0",
+      "commander": "^2.20.0",
+      "figlet": "^1.2.0",
+      "fs": "^0.0.1-security",
+      "fs-extra": "^7.0.1",
+      "inquirer": "^5.2.0",
+      "node-getopt": "^0.3.2",
+      "node-glob": "^1.2.0",
+      "path": "^0.12.7",
+      "shelljs": "^0.8.2"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
