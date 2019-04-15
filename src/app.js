@@ -23,19 +23,21 @@ import ProjectExample from './ProjectExample.js';
 
 
 export default class App {
-    constructor( appRoot, projectRoot, packJSON, osName, cityName ) {
+    constructor( appRoot, projectRoot, packJSON, config, program ) {
 
         this.appRoot = appRoot;
         this.projectRoot = projectRoot;
         this.packJSON = packJSON;   
-        this.osName = osName;
+        this.config = config;
 
-        this.cmdCityName = cityName;
+        this.program = program;
 
         console.log( [ 
             'appRoot: ' + this.appRoot
             , 'projectRoot: ' + this.projectRoot 
             ].join("\n") );
+
+        return;
 
         this.init();
 
@@ -50,13 +52,6 @@ export default class App {
         this.welcome();
 
         this.system = 1;
-
-        /*
-        shell.exec(  [ 
-            'cd ' + this.projectRoot
-            , 'git config core.fileMode false && git config core.autocrlf false'
-        ].join('&&') );
-        */
 
         console.log();
 
@@ -147,7 +142,7 @@ export default class App {
 
 			let space = '        ';
 
-			console.log( space + 'os-release:', this.osName );
+			console.log( space + 'os-release:', this.config );
 			console.log()
 			console.log( space + 'building list:' );
 			this.buildingList.map( ( item ) => {
@@ -191,7 +186,7 @@ export default class App {
             });
         }).then( () => {
 			if( this.confirm_install_tools && this.confirm_install_tools == 'yes' ){
-				let shellFile = `/bin/bash ${this.appRoot}/shell/${this.osName}.sh`;
+				let shellFile = `/bin/bash ${this.appRoot}/shell/${this.config}.sh`;
 				shell.exec( shellFile ); 
 			}
             return new Promise( ( resolve ) => {
@@ -229,11 +224,11 @@ export default class App {
 		return r;
 	}
 
-	resolveDirCityName( src, output, cityName ){
+	resolveDirCityName( src, output, program ){
 		let r = [];
 
 		let obj = {};
-		let tmp = path.resolve( this.projectRoot, src, cityName );
+		let tmp = path.resolve( this.projectRoot, src, program );
 		let postfix = this.getPostfixName( src )
 
 		if( fs.pathExistsSync( tmp ) ){
@@ -241,15 +236,15 @@ export default class App {
 		}
 
 		if( !obj.source ){
-			tmp = path.resolve( this.projectRoot, src, cityName +  [ '_', postfix ].join('')  );
+			tmp = path.resolve( this.projectRoot, src, program +  [ '_', postfix ].join('')  );
 			if( fs.pathExistsSync( tmp ) ){
 				obj.source = tmp;
 			}
 		}
 		if( !obj.source ) return r;
 
-		obj.cityName = cityName;
-		tmp = path.resolve( this.projectRoot, output,  obj.cityName.replace( /shi$/i, '' ) + 'shi'  );
+		obj.program = program;
+		tmp = path.resolve( this.projectRoot, output,  obj.program.replace( /shi$/i, '' ) + 'shi'  );
 
 		obj.output = tmp;
 
@@ -289,8 +284,8 @@ export default class App {
 			let obj = {};
 
 			obj.source = path.resolve( dir, item );
-			obj.cityName = p.getDirCityName( item );
-			obj.output = path.resolve( this.projectRoot, output,  obj.cityName.replace( /shi$/i, '' ) + 'shi'  );
+			obj.program = p.getDirCityName( item );
+			obj.output = path.resolve( this.projectRoot, output,  obj.program.replace( /shi$/i, '' ) + 'shi'  );
 
 			r.push( obj );
 		});
@@ -416,7 +411,7 @@ export default class App {
 
 }
 
-export function init( APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName ){
-    let AppIns = new App( APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName ); 
+export function init( APP_ROOT, PROJECT_ROOT, packJSON, config, program ){
+    let AppIns = new App( APP_ROOT, PROJECT_ROOT, packJSON, config, program ); 
 }
 

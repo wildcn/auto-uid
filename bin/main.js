@@ -19,9 +19,7 @@ program.parse(process.argv);
 
 PROJECT_ROOT = program.path || PROJECT_ROOT;
 
-console.log(PROJECT_ROOT);
-
 require('babel-core/register');
 require("babel-polyfill");
 var init = require('./app').init;
-//init( APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName );
+init(APP_ROOT, PROJECT_ROOT, packJSON, config, program);

@@ -62,17 +62,19 @@ var success = _chalk2.default.greenBright;
 var info = _chalk2.default.bold.blue;
 
 var App = function () {
-    function App(appRoot, projectRoot, packJSON, osName, cityName) {
+    function App(appRoot, projectRoot, packJSON, config, program) {
         _classCallCheck(this, App);
 
         this.appRoot = appRoot;
         this.projectRoot = projectRoot;
         this.packJSON = packJSON;
-        this.osName = osName;
+        this.config = config;
 
-        this.cmdCityName = cityName;
+        this.program = program;
 
         console.log(['appRoot: ' + this.appRoot, 'projectRoot: ' + this.projectRoot].join("\n"));
+
+        return;
 
         this.init();
 
@@ -91,13 +93,6 @@ var App = function () {
             this.welcome();
 
             this.system = 1;
-
-            /*
-            shell.exec(  [ 
-                'cd ' + this.projectRoot
-                , 'git config core.fileMode false && git config core.autocrlf false'
-            ].join('&&') );
-            */
 
             console.log();
 
@@ -212,7 +207,7 @@ var App = function () {
 
                 var space = '        ';
 
-                console.log(space + 'os-release:', _this.osName);
+                console.log(space + 'os-release:', _this.config);
                 console.log();
                 console.log(space + 'building list:');
                 _this.buildingList.map(function (item) {
@@ -251,7 +246,7 @@ var App = function () {
                 });
             }).then(function () {
                 if (_this.confirm_install_tools && _this.confirm_install_tools == 'yes') {
-                    var shellFile = "/bin/bash " + _this.appRoot + "/shell/" + _this.osName + ".sh";
+                    var shellFile = "/bin/bash " + _this.appRoot + "/shell/" + _this.config + ".sh";
                     _shelljs2.default.exec(shellFile);
                 }
                 return new Promise(function (resolve) {
@@ -291,11 +286,11 @@ var App = function () {
         }
     }, {
         key: "resolveDirCityName",
-        value: function resolveDirCityName(src, output, cityName) {
+        value: function resolveDirCityName(src, output, program) {
             var r = [];
 
             var obj = {};
-            var tmp = _path2.default.resolve(this.projectRoot, src, cityName);
+            var tmp = _path2.default.resolve(this.projectRoot, src, program);
             var postfix = this.getPostfixName(src);
 
             if (_fsExtra2.default.pathExistsSync(tmp)) {
@@ -303,15 +298,15 @@ var App = function () {
             }
 
             if (!obj.source) {
-                tmp = _path2.default.resolve(this.projectRoot, src, cityName + ['_', postfix].join(''));
+                tmp = _path2.default.resolve(this.projectRoot, src, program + ['_', postfix].join(''));
                 if (_fsExtra2.default.pathExistsSync(tmp)) {
                     obj.source = tmp;
                 }
             }
             if (!obj.source) return r;
 
-            obj.cityName = cityName;
-            tmp = _path2.default.resolve(this.projectRoot, output, obj.cityName.replace(/shi$/i, '') + 'shi');
+            obj.program = program;
+            tmp = _path2.default.resolve(this.projectRoot, output, obj.program.replace(/shi$/i, '') + 'shi');
 
             obj.output = tmp;
 
@@ -356,8 +351,8 @@ var App = function () {
                 var obj = {};
 
                 obj.source = _path2.default.resolve(dir, item);
-                obj.cityName = p.getDirCityName(item);
-                obj.output = _path2.default.resolve(_this2.projectRoot, output, obj.cityName.replace(/shi$/i, '') + 'shi');
+                obj.program = p.getDirCityName(item);
+                obj.output = _path2.default.resolve(_this2.projectRoot, output, obj.program.replace(/shi$/i, '') + 'shi');
 
                 r.push(obj);
             });
@@ -897,6 +892,6 @@ var App = function () {
 }();
 
 exports.default = App;
-function init(APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName) {
-    var AppIns = new App(APP_ROOT, PROJECT_ROOT, packJSON, osName, cityName);
+function init(APP_ROOT, PROJECT_ROOT, packJSON, config, program) {
+    var AppIns = new App(APP_ROOT, PROJECT_ROOT, packJSON, config, program);
 }
