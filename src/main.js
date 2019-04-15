@@ -23,10 +23,7 @@ var program = require('commander');
 
 program
   .version( config.version, '-v, --version' )
-  .option('-p, --peppers', 'Add peppers')
-  .option('-P, --pineapple', 'Add pineapple')
-  .option('-b, --bbq-sauce', 'Add bbq sauce')
-  .option('-c, --cheese [type]', 'Add the specified type of cheese [marble]', 'marble')
+  //.option('-b, --bbq-sauce', 'Add bbq sauce')
   .parse(process.argv);
 
 require('babel-core/register');
