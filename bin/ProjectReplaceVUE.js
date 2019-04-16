@@ -55,7 +55,11 @@ var ProjectReplaceVUE = function (_Project) {
         key: "init",
         value: function init() {
             console.log(this.app.projectInfo);
+
             this.getChangeFiles();
+
+            console.log('this.newFile:', this.newFile);
+            console.log('this.modifiedFile:', this.modifiedFile);
         }
     }]);
 

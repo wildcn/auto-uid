@@ -23,8 +23,6 @@ export default class Project {
     constructor( app ){
         this.app = app;
 
-        this.gitRoot = this.app.projectRoot;
-
         this.newFile = [];
         this.modifiedFile = [];
 
@@ -43,14 +41,27 @@ export default class Project {
 
 
         let lines = gitStatus.stdout.split( '\n' );
+        let info = this.app.projectInfo;
+
+        let p = this;
 
         lines.map( ( item, index ) => {
             item = item.trim();
             item.replace( /new[\s]+file:[\s]+(.*)/, function( $0, $1 ){
-                //console.log( 'find new file:', $1 );
+                if( info.feuid.extension.test( $1 )
+                    && info.feuid.dir.test( $1 )
+                ){
+                    //console.log( 'find new file:', $1 );
+                    p.newFile.push( $1 );
+                }
             });
             item.replace( /modified:[\s]+(.*)/, function( $0, $1 ){
-                //console.log( 'find new modified:', $1 );
+                if( info.feuid.extension.test( $1 )
+                    && info.feuid.dir.test( $1 )
+                ){
+                    //console.log( 'find new modified:', $1 );
+                    p.modifiedFile.push( $1 );
+                }
             });
         });
     }

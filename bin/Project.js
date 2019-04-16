@@ -59,8 +59,6 @@ var Project = function () {
 
         this.app = app;
 
-        this.gitRoot = this.app.projectRoot;
-
         this.newFile = [];
         this.modifiedFile = [];
 
@@ -81,14 +79,23 @@ var Project = function () {
             var gitStatus = _shelljs2.default.exec("cd '" + this.app.projectRoot + "' && git status", { silent: true });
 
             var lines = gitStatus.stdout.split('\n');
+            var info = this.app.projectInfo;
+
+            var p = this;
 
             lines.map(function (item, index) {
                 item = item.trim();
                 item.replace(/new[\s]+file:[\s]+(.*)/, function ($0, $1) {
-                    //console.log( 'find new file:', $1 );
+                    if (info.feuid.extension.test($1) && info.feuid.dir.test($1)) {
+                        //console.log( 'find new file:', $1 );
+                        p.newFile.push($1);
+                    }
                 });
                 item.replace(/modified:[\s]+(.*)/, function ($0, $1) {
-                    //console.log( 'find new modified:', $1 );
+                    if (info.feuid.extension.test($1) && info.feuid.dir.test($1)) {
+                        //console.log( 'find new modified:', $1 );
+                        p.modifiedFile.push($1);
+                    }
                 });
             });
         }

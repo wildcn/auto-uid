@@ -23,7 +23,11 @@ export default class ProjectReplaceVUE extends Project {
 
     init() {
         console.log( this.app.projectInfo );
+
         this.getChangeFiles();
+
+        console.log( 'this.newFile:', this.newFile );
+        console.log( 'this.modifiedFile:', this.modifiedFile );
     }
 
 }
