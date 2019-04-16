@@ -82,18 +82,27 @@ var ProjectReplaceVUE = function (_Project) {
 
                 _this2.curContent = _fsExtra2.default.readFileSync(filepath, { encoding: _this2.info.feuid.encoding || 'utf8' });
 
-                _this2.getTemplate();
+                var tagInfo = _this2.getTag('template', 0);
+
+                tagInfo.data.map(function (item) {
+                    //console.log( item );
+                });
+
                 _this2.getRoot();
             });
         }
     }, {
-        key: "getTemplate",
-        value: function getTemplate() {
+        key: "getTag",
+        value: function getTag(tag) {
+            var matchAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
             //console.log( this.content );
             var curIndex = 0;
+            var result = { content: this.curContent, data: [] };
             while (true) {
                 var tmpContent = this.curContent.slice(curIndex);
-                var startReg = /<div[^<\/]*?>/i;
+                //let startReg = /<div[^<\/]*?>/i;
+                var startReg = new RegExp("<" + tag + "[^<\\/]*?>", 'i');
                 var tmp = tmpContent.match(startReg);
 
                 if (!tmp) {
@@ -101,35 +110,59 @@ var ProjectReplaceVUE = function (_Project) {
                 }
 
                 console.log(this.curFilepath);
-                console.log(curIndex, tmp.index);
-                //console.log( tmpContent );
 
                 var nextIndex = curIndex + tmp.index + 1;
 
-                var endIndex = this.matchEnd(nextIndex, startReg);
+                var endResult = this.matchEnd(nextIndex, startReg, new RegExp("<\\/" + tag + ">", 'i'), tag.length + 3);
+                var endIndex = endResult.end;
 
+                /*
                 //console.log( 'endIndex:', endIndex );
+                console.log( curIndex + tmp.index, endIndex );
+                console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
+                */
 
-                console.log(this.curContent.slice(curIndex + tmp.index, endIndex));
+                if (endIndex) {
+                    var data = {
+                        fullTag: {
+                            start: curIndex + tmp.index,
+                            end: endIndex,
+                            tagContent: this.curContent.slice(curIndex + tmp.index, endIndex)
+                        },
+                        innerTag: {
+                            start: curIndex + tmp.index + tmp[0].length,
+                            end: endResult.start
+                        }
+                    };
+                    data.innerTag.tagContent = this.curContent.slice(data.innerTag.start, data.innerTag.end);
+                    result.data.push(data);
+                }
 
                 curIndex = nextIndex;
+                if (!matchAll) {
+                    break;
+                }
             }
+            return result;
         }
     }, {
         key: "matchEnd",
-        value: function matchEnd(nextIndex, startReg) {
-            var r = 0;
+        value: function matchEnd(nextIndex, startReg, endReg, tagLength) {
+            var r = { start: 0, end: 0 };
 
             var endContent = this.curContent.slice(nextIndex);
-            var tmpEnd = endContent.match(/<\/div>/i);
+            //let tmpEnd = endContent.match( /<\/div>/i  );
+            var tmpEnd = endContent.match(endReg);
 
             if (tmpEnd) {
-                var endMatch = this.curContent.slice(nextIndex, nextIndex + tmpEnd.index + 6);
+                var endMatch = this.curContent.slice(nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length);
+                var tmpMatch = endMatch.match(startReg);
                 //console.log( endMatch );
-                if (endMatch.match(startReg)) {
-                    r = this.matchEnd(nextIndex + tmpEnd.index + 6, startReg);
+                if (tmpMatch) {
+                    r = this.matchEnd(nextIndex + tmpEnd.index + tagLength, startReg, endReg, tmpEnd[0].length);
                 } else {
-                    r = nextIndex + tmpEnd.index + 6;
+                    r.start = nextIndex + tmpEnd.index;
+                    r.end = nextIndex + tmpEnd.index + tmpEnd[0].length;
                 }
             }
 
