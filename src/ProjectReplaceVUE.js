@@ -57,12 +57,10 @@ export default class ProjectReplaceVUE extends Project {
     }
 
     getTag( tag, matchAll = false ){
-        //console.log( this.content );
         let curIndex = 0;
         let result = { content: this.curContent, data: [] };
         while( true ){
             let tmpContent = this.curContent.slice( curIndex );
-            //let startReg = /<div[^<\/]*?>/i;
             let startReg = new RegExp( `<${tag}[^<\\/]*?>`, 'i' );
             let tmp = tmpContent.match( startReg  );
 
@@ -78,7 +76,6 @@ export default class ProjectReplaceVUE extends Project {
             let endIndex = endResult.end;
 
             /*
-            //console.log( 'endIndex:', endIndex );
             console.log( curIndex + tmp.index, endIndex );
             console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
             */
@@ -111,13 +108,11 @@ export default class ProjectReplaceVUE extends Project {
         let r = { start: 0, end: 0};
 
         let endContent = this.curContent.slice( nextIndex );
-        //let tmpEnd = endContent.match( /<\/div>/i  );
         let tmpEnd = endContent.match( endReg  );
 
         if( tmpEnd ){
             let endMatch = this.curContent.slice( nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length ) 
             let tmpMatch = endMatch.match( startReg );
-            //console.log( endMatch );
             if( tmpMatch ){
                 r = this.matchEnd( nextIndex + tmpEnd.index + tagLength, startReg, endReg, tmpEnd[0].length );
             }else{

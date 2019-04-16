@@ -96,12 +96,10 @@ var ProjectReplaceVUE = function (_Project) {
         value: function getTag(tag) {
             var matchAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-            //console.log( this.content );
             var curIndex = 0;
             var result = { content: this.curContent, data: [] };
             while (true) {
                 var tmpContent = this.curContent.slice(curIndex);
-                //let startReg = /<div[^<\/]*?>/i;
                 var startReg = new RegExp("<" + tag + "[^<\\/]*?>", 'i');
                 var tmp = tmpContent.match(startReg);
 
@@ -117,7 +115,6 @@ var ProjectReplaceVUE = function (_Project) {
                 var endIndex = endResult.end;
 
                 /*
-                //console.log( 'endIndex:', endIndex );
                 console.log( curIndex + tmp.index, endIndex );
                 console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
                 */
@@ -151,13 +148,11 @@ var ProjectReplaceVUE = function (_Project) {
             var r = { start: 0, end: 0 };
 
             var endContent = this.curContent.slice(nextIndex);
-            //let tmpEnd = endContent.match( /<\/div>/i  );
             var tmpEnd = endContent.match(endReg);
 
             if (tmpEnd) {
                 var endMatch = this.curContent.slice(nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length);
                 var tmpMatch = endMatch.match(startReg);
-                //console.log( endMatch );
                 if (tmpMatch) {
                     r = this.matchEnd(nextIndex + tmpEnd.index + tagLength, startReg, endReg, tmpEnd[0].length);
                 } else {
