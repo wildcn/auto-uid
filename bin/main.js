@@ -57,19 +57,3 @@ function resolveProjectInfo(proot) {
 
     return r;
 }
-/*
-        let tmpPath = this.app.projectRoot;
-        while( true ){
-            let tmpFile = path.join( tmpPath, 'package.json' );
-
-            if( fs.existsSync( tmpFile ) ){
-                console.log( 'tmpFile', tmpFile );
-                break;
-            }else{
-                if( tmpPath.length === 1 ){
-                    break;
-                }
-                tmpPath = path.join( tmpPath, '../' );
-            }
-        }
-*/
