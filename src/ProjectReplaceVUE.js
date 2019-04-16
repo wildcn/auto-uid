@@ -46,19 +46,35 @@ export default class ProjectReplaceVUE extends Project {
 
             this.curContent = fs.readFileSync( filepath, { encoding: this.info.feuid.encoding || 'utf8' } );
 
-            let tagInfo = this.getTag( 'template', 0 );
+            let tagInfo = this.getTag( 'template', filepath, 0 );
 
-            tagInfo.data.map( item => {
-                //console.log( item );
+            tagInfo.data.reverse().map( item => {
+                console.log( item );
+                let content = this.addDataId( item.innerTag.tagContent );
+
+                console.log( content );
             });
 
             this.getRoot();
         });
     }
 
-    getTag( tag, matchAll = false ){
+    addDataId( content ){
+        content = content.replace( /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi, function( $0, $1, $2 ){
+            let uid = '';
+            if( !/data-testid\=/i.test( $2 ) ){
+                uid = ` data-testid="test" `
+            }
+            let r = `${$1}${uid}${$2}`;
+            return r;
+        });
+
+        return content;
+    }
+
+    getTag( tag, filepath, matchAll = false ){
         let curIndex = 0;
-        let result = { content: this.curContent, data: [] };
+        let result = { content: this.curContent, data: [], filepath: filepath };
         while( true ){
             let tmpContent = this.curContent.slice( curIndex );
             let startReg = new RegExp( `<${tag}[^<\\/]*?>`, 'i' );

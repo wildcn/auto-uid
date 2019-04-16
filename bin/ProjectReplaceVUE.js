@@ -82,22 +82,39 @@ var ProjectReplaceVUE = function (_Project) {
 
                 _this2.curContent = _fsExtra2.default.readFileSync(filepath, { encoding: _this2.info.feuid.encoding || 'utf8' });
 
-                var tagInfo = _this2.getTag('template', 0);
+                var tagInfo = _this2.getTag('template', filepath, 0);
 
-                tagInfo.data.map(function (item) {
-                    //console.log( item );
+                tagInfo.data.reverse().map(function (item) {
+                    console.log(item);
+                    var content = _this2.addDataId(item.innerTag.tagContent);
+
+                    console.log(content);
                 });
 
                 _this2.getRoot();
             });
         }
     }, {
+        key: "addDataId",
+        value: function addDataId(content) {
+            content = content.replace(/(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi, function ($0, $1, $2) {
+                var uid = '';
+                if (!/data-testid\=/i.test($2)) {
+                    uid = " data-testid=\"test\" ";
+                }
+                var r = "" + $1 + uid + $2;
+                return r;
+            });
+
+            return content;
+        }
+    }, {
         key: "getTag",
-        value: function getTag(tag) {
-            var matchAll = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        value: function getTag(tag, filepath) {
+            var matchAll = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
             var curIndex = 0;
-            var result = { content: this.curContent, data: [] };
+            var result = { content: this.curContent, data: [], filepath: filepath };
             while (true) {
                 var tmpContent = this.curContent.slice(curIndex);
                 var startReg = new RegExp("<" + tag + "[^<\\/]*?>", 'i');
