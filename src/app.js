@@ -18,7 +18,7 @@ const info = chalk.bold.blue;
 import * as CONST from './data/constant.js';
 import * as DATA from './data/data.js';
 
-import ProjectExample from './ProjectExample.js';
+import ProjectReplaceSource from './ProjectReplaceSource.js';
 
 
 
@@ -31,18 +31,22 @@ export default class App {
         this.config = config;
         this.program = program;
 
+        console.log( info( packJSON.name ) );
         console.log( [ 
             'appRoot: ' + this.appRoot
             , 'projectRoot: ' + this.projectRoot 
             ].join("\n") );
 
         this.init();
-
-        console.log();
     }
 
     init() {
-        this.project = new ProjectExample( this );
+        if( (!shell.which( 'git' ) ) ){
+            console.error( error( 'feuid - git not exists' ) );
+            return;
+        }
+
+        this.project = new ProjectReplaceSource( this );
     }
 
     fileExists( file ) {

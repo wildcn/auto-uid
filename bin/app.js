@@ -44,9 +44,9 @@ var _data = require("./data/data.js");
 
 var DATA = _interopRequireWildcard(_data);
 
-var _ProjectExample = require("./ProjectExample.js");
+var _ProjectReplaceSource = require("./ProjectReplaceSource.js");
 
-var _ProjectExample2 = _interopRequireDefault(_ProjectExample);
+var _ProjectReplaceSource2 = _interopRequireDefault(_ProjectReplaceSource);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -69,17 +69,21 @@ var App = function () {
         this.config = config;
         this.program = program;
 
+        console.log(info(packJSON.name));
         console.log(['appRoot: ' + this.appRoot, 'projectRoot: ' + this.projectRoot].join("\n"));
 
         this.init();
-
-        console.log();
     }
 
     _createClass(App, [{
         key: "init",
         value: function init() {
-            this.project = new _ProjectExample2.default(this);
+            if (!_shelljs2.default.which('git')) {
+                console.error(error('feuid - git not exists'));
+                return;
+            }
+
+            this.project = new _ProjectReplaceSource2.default(this);
         }
     }, {
         key: "fileExists",

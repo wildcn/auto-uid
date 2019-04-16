@@ -14,7 +14,7 @@ var config = require(APP_ROOT + '/config.json');
 
 var program = require('commander');
 
-program.version(config.version).option('-p, --path <path>', '设置项目路径');
+program.version(packJSON.version).option('-p, --path <path>', '设置项目路径');
 program.parse(process.argv);
 
 PROJECT_ROOT = program.path || PROJECT_ROOT;
