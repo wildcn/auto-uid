@@ -54,6 +54,7 @@ var ProjectReplaceVUE = function (_Project) {
     _createClass(ProjectReplaceVUE, [{
         key: "init",
         value: function init() {
+            console.log(this.app.projectInfo);
             this.getChangeFiles();
         }
     }]);
