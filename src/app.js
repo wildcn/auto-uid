@@ -47,6 +47,12 @@ export default class App {
             return;
         }
 
+        if( (!fs.existsSync( `${this.projectRoot}/.git` ) ) ){
+            console.error( error( 'feuid - dir is not git' ) );
+            return;
+        }
+
+
         this.project = new ProjectReplaceVUE( this );
     }
 

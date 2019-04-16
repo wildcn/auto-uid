@@ -55,28 +55,5 @@ export default class Project {
         });
     }
 
-    resolveGitRoot(){
-        console.log( 'this.app.projectRoot:', this.app.projectRoot );
-
-
-        let tmpPath = this.app.projectRoot;
-        while( true ){
-            let tmpFile = path.join( tmpPath, 'package.json' );
-
-            if( fs.existsSync( tmpFile ) ){
-                console.log( 'tmpFile', tmpFile );
-                break;
-            }else{
-                if( tmpPath.length === 1 ){
-                    break;
-                }
-                tmpPath = path.join( tmpPath, '../' );
-            }
-        }
-
-        
-        console.log( 'this.gitRoot:', this.gitRoot );
-    }
-
 
 }

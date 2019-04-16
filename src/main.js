@@ -24,11 +24,12 @@ PROJECT_ROOT = program.path || PROJECT_ROOT;
 
 const projectInfo = resolveProjectInfo( PROJECT_ROOT );
 
+PROJECT_ROOT = projectInfo.projectRoot;
+
 require('babel-core/register');
 require("babel-polyfill");
 const init = require( './app' ).init;
 init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
-
 
 function resolveProjectInfo( proot ){
     let r = {};
@@ -52,14 +53,12 @@ function resolveProjectInfo( proot ){
         }
     }
 
-    console.log( `${r.projectRoot}/feuid.json` );
-
     r.feuid = merge.all( [
         {}
-        , fs.existsSync( `${r.projectRoot}/feuid.json` ) 
-            ? require( `${r.projectRoot}/feuid.json` ) : {}
-        , fs.existsSync( `${r.currentRoot}/feuid.json` ) 
-            ? require( `${r.currentRoot}/feuid.json` ) : {} 
+        , fs.existsSync( `${r.projectRoot}/feuid.js` ) 
+            ? require( `${r.projectRoot}/feuid.js` ) : {}
+        , fs.existsSync( `${r.currentRoot}/feuid.js` ) 
+            ? require( `${r.currentRoot}/feuid.js` ) : {} 
     ], { arrayMerge: (destinationArray, sourceArray, options) => sourceArray });
 
     return r;

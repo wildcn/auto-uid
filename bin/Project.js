@@ -92,28 +92,6 @@ var Project = function () {
                 });
             });
         }
-    }, {
-        key: "resolveGitRoot",
-        value: function resolveGitRoot() {
-            console.log('this.app.projectRoot:', this.app.projectRoot);
-
-            var tmpPath = this.app.projectRoot;
-            while (true) {
-                var tmpFile = _path2.default.join(tmpPath, 'package.json');
-
-                if (_fs2.default.existsSync(tmpFile)) {
-                    console.log('tmpFile', tmpFile);
-                    break;
-                } else {
-                    if (tmpPath.length === 1) {
-                        break;
-                    }
-                    tmpPath = _path2.default.join(tmpPath, '../');
-                }
-            }
-
-            console.log('this.gitRoot:', this.gitRoot);
-        }
     }]);
 
     return Project;

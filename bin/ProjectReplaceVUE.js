@@ -54,12 +54,7 @@ var ProjectReplaceVUE = function (_Project) {
     _createClass(ProjectReplaceVUE, [{
         key: "init",
         value: function init() {
-            console.log('ProjectReplaceVUE.init', Date.now());
-
-            console.log(this.app.projectInfo);
-
-            //this.resolveGitRoot();
-            //this.getChangeFiles();
+            this.getChangeFiles();
         }
     }]);
 
