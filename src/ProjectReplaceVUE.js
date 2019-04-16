@@ -16,11 +16,18 @@ const info = chalk.bold.blue;
 
 import Project from './Project.js';
 
-export default class ProjectExample extends Project {
+export default class ProjectReplaceVUE extends Project {
     constructor( app ){
         super( app );
     }
 
     init() {
+        console.log( 'ProjectReplaceVUE.init', Date.now() );
+
+        console.log( this.app.projectInfo );
+
+        //this.resolveGitRoot();
+        //this.getChangeFiles();
     }
+
 }

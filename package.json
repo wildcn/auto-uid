@@ -7,6 +7,7 @@
     "feuid": "bin/main.js"
   },
   "scripts": {
+    "precommit": "feuid",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "babel -w src/ -d bin/",
     "public": "babel src/ -d bin/"
@@ -37,6 +38,7 @@
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "commander": "^2.20.0",
+    "deepmerge": "^3.2.0",
     "figlet": "^1.2.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^7.0.1",

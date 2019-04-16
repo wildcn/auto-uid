@@ -18,24 +18,25 @@ const info = chalk.bold.blue;
 import * as CONST from './data/constant.js';
 import * as DATA from './data/data.js';
 
-import ProjectReplaceSource from './ProjectReplaceSource.js';
-
-
+import ProjectReplaceVUE from './ProjectReplaceVUE.js';
 
 export default class App {
-    constructor( appRoot, projectRoot, packJSON, config, program ) {
+    constructor( appRoot, projectRoot, packJSON, config, program, projectInfo ) {
 
         this.appRoot = appRoot;
         this.projectRoot = projectRoot;
         this.packJSON = packJSON;   
         this.config = config;
         this.program = program;
+        this.projectInfo = projectInfo;
 
+        /*
         console.log( info( packJSON.name ) );
         console.log( [ 
             'appRoot: ' + this.appRoot
             , 'projectRoot: ' + this.projectRoot 
             ].join("\n") );
+        */
 
         this.init();
     }
@@ -46,7 +47,7 @@ export default class App {
             return;
         }
 
-        this.project = new ProjectReplaceSource( this );
+        this.project = new ProjectReplaceVUE( this );
     }
 
     fileExists( file ) {
@@ -55,7 +56,7 @@ export default class App {
 
 }
 
-export function init( APP_ROOT, PROJECT_ROOT, packJSON, config, program ){
-    let AppIns = new App( APP_ROOT, PROJECT_ROOT, packJSON, config, program ); 
+export function init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo ){
+    let AppIns = new App( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo ); 
 }
 

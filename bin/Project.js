@@ -59,6 +59,11 @@ var Project = function () {
 
         this.app = app;
 
+        this.gitRoot = this.app.projectRoot;
+
+        this.newFile = [];
+        this.modifiedFile = [];
+
         this.init();
     }
 
@@ -69,6 +74,45 @@ var Project = function () {
         key: "initMethod",
         value: function initMethod() {
             console.log('initMethod', Date.now());
+        }
+    }, {
+        key: "getChangeFiles",
+        value: function getChangeFiles() {
+            var gitStatus = _shelljs2.default.exec("cd '" + this.app.projectRoot + "' && git status", { silent: true });
+
+            var lines = gitStatus.stdout.split('\n');
+
+            lines.map(function (item, index) {
+                item = item.trim();
+                item.replace(/new[\s]+file:[\s]+(.*)/, function ($0, $1) {
+                    //console.log( 'find new file:', $1 );
+                });
+                item.replace(/modified:[\s]+(.*)/, function ($0, $1) {
+                    //console.log( 'find new modified:', $1 );
+                });
+            });
+        }
+    }, {
+        key: "resolveGitRoot",
+        value: function resolveGitRoot() {
+            console.log('this.app.projectRoot:', this.app.projectRoot);
+
+            var tmpPath = this.app.projectRoot;
+            while (true) {
+                var tmpFile = _path2.default.join(tmpPath, 'package.json');
+
+                if (_fs2.default.existsSync(tmpFile)) {
+                    console.log('tmpFile', tmpFile);
+                    break;
+                } else {
+                    if (tmpPath.length === 1) {
+                        break;
+                    }
+                    tmpPath = _path2.default.join(tmpPath, '../');
+                }
+            }
+
+            console.log('this.gitRoot:', this.gitRoot);
         }
     }]);
 

@@ -44,9 +44,9 @@ var _data = require("./data/data.js");
 
 var DATA = _interopRequireWildcard(_data);
 
-var _ProjectReplaceSource = require("./ProjectReplaceSource.js");
+var _ProjectReplaceVUE = require("./ProjectReplaceVUE.js");
 
-var _ProjectReplaceSource2 = _interopRequireDefault(_ProjectReplaceSource);
+var _ProjectReplaceVUE2 = _interopRequireDefault(_ProjectReplaceVUE);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -60,7 +60,7 @@ var success = _chalk2.default.greenBright;
 var info = _chalk2.default.bold.blue;
 
 var App = function () {
-    function App(appRoot, projectRoot, packJSON, config, program) {
+    function App(appRoot, projectRoot, packJSON, config, program, projectInfo) {
         _classCallCheck(this, App);
 
         this.appRoot = appRoot;
@@ -68,9 +68,15 @@ var App = function () {
         this.packJSON = packJSON;
         this.config = config;
         this.program = program;
+        this.projectInfo = projectInfo;
 
-        console.log(info(packJSON.name));
-        console.log(['appRoot: ' + this.appRoot, 'projectRoot: ' + this.projectRoot].join("\n"));
+        /*
+        console.log( info( packJSON.name ) );
+        console.log( [ 
+            'appRoot: ' + this.appRoot
+            , 'projectRoot: ' + this.projectRoot 
+            ].join("\n") );
+        */
 
         this.init();
     }
@@ -83,7 +89,7 @@ var App = function () {
                 return;
             }
 
-            this.project = new _ProjectReplaceSource2.default(this);
+            this.project = new _ProjectReplaceVUE2.default(this);
         }
     }, {
         key: "fileExists",
@@ -96,6 +102,6 @@ var App = function () {
 }();
 
 exports.default = App;
-function init(APP_ROOT, PROJECT_ROOT, packJSON, config, program) {
-    var AppIns = new App(APP_ROOT, PROJECT_ROOT, packJSON, config, program);
+function init(APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo) {
+    var AppIns = new App(APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo);
 }
