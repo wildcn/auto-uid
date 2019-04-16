@@ -58,9 +58,11 @@ var Project = function () {
         _classCallCheck(this, Project);
 
         this.app = app;
+        this.info = this.app.projectInfo;
 
         this.newFile = [];
         this.modifiedFile = [];
+        this.allFile = [];
 
         this.init();
     }
@@ -76,25 +78,32 @@ var Project = function () {
     }, {
         key: "getChangeFiles",
         value: function getChangeFiles() {
-            var gitStatus = _shelljs2.default.exec("cd '" + this.app.projectRoot + "' && git status", { silent: true });
+            var info = this.info;
+
+            var gitStatus = _shelljs2.default.exec("cd '" + info.currentRoot + "' && git status", { silent: true });
 
             var lines = gitStatus.stdout.split('\n');
-            var info = this.app.projectInfo;
 
             var p = this;
 
             lines.map(function (item, index) {
                 item = item.trim();
                 item.replace(/new[\s]+file:[\s]+(.*)/, function ($0, $1) {
-                    if (info.feuid.extension.test($1) && info.feuid.dir.test($1)) {
+                    var fullpath = _path2.default.join(info.currentRoot, $1);
+                    var filepath = fullpath.replace(info.projectRoot, '');
+                    if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
                         //console.log( 'find new file:', $1 );
-                        p.newFile.push($1);
+                        p.newFile.push(fullpath);
+                        p.allFile.push(fullpath);
                     }
                 });
                 item.replace(/modified:[\s]+(.*)/, function ($0, $1) {
-                    if (info.feuid.extension.test($1) && info.feuid.dir.test($1)) {
+                    var fullpath = _path2.default.join(info.currentRoot, $1);
+                    var filepath = fullpath.replace(info.projectRoot, '');
+                    if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
                         //console.log( 'find new modified:', $1 );
-                        p.modifiedFile.push($1);
+                        p.modifiedFile.push(fullpath);
+                        p.allFile.push(fullpath);
                     }
                 });
             });

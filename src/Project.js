@@ -22,9 +22,11 @@ import * as DATA from './data/data.js';
 export default class Project {
     constructor( app ){
         this.app = app;
+        this.info = this.app.projectInfo;
 
         this.newFile = [];
         this.modifiedFile = [];
+        this.allFile = [];
 
         this.init();
     }
@@ -37,30 +39,37 @@ export default class Project {
     }
 
     getChangeFiles(){
-        let gitStatus = shell.exec( `cd '${this.app.projectRoot}' && git status`, { silent: true } );
+        let info = this.info;
+
+        let gitStatus = shell.exec( `cd '${info.currentRoot}' && git status`, { silent: true } );
 
 
         let lines = gitStatus.stdout.split( '\n' );
-        let info = this.app.projectInfo;
 
         let p = this;
 
         lines.map( ( item, index ) => {
             item = item.trim();
             item.replace( /new[\s]+file:[\s]+(.*)/, function( $0, $1 ){
+                let fullpath = path.join( info.currentRoot, $1 );
+                let filepath =  fullpath.replace( info.projectRoot, '' );
                 if( info.feuid.extension.test( $1 )
-                    && info.feuid.dir.test( $1 )
+                    && info.feuid.dir.test( filepath )
                 ){
                     //console.log( 'find new file:', $1 );
-                    p.newFile.push( $1 );
+                    p.newFile.push( fullpath );
+                    p.allFile.push( fullpath );
                 }
             });
             item.replace( /modified:[\s]+(.*)/, function( $0, $1 ){
+                let fullpath = path.join( info.currentRoot, $1 );
+                let filepath =  fullpath.replace( info.projectRoot, '' );
                 if( info.feuid.extension.test( $1 )
-                    && info.feuid.dir.test( $1 )
+                    && info.feuid.dir.test( filepath )
                 ){
                     //console.log( 'find new modified:', $1 );
-                    p.modifiedFile.push( $1 );
+                    p.modifiedFile.push( fullpath );
+                    p.allFile.push( fullpath );
                 }
             });
         });

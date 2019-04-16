@@ -48,7 +48,11 @@ var ProjectReplaceVUE = function (_Project) {
     function ProjectReplaceVUE(app) {
         _classCallCheck(this, ProjectReplaceVUE);
 
-        return _possibleConstructorReturn(this, (ProjectReplaceVUE.__proto__ || Object.getPrototypeOf(ProjectReplaceVUE)).call(this, app));
+        var _this = _possibleConstructorReturn(this, (ProjectReplaceVUE.__proto__ || Object.getPrototypeOf(ProjectReplaceVUE)).call(this, app));
+
+        _this.delimiter = '|||||';
+        _this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
+        return _this;
     }
 
     _createClass(ProjectReplaceVUE, [{
@@ -58,9 +62,82 @@ var ProjectReplaceVUE = function (_Project) {
 
             this.getChangeFiles();
 
-            console.log('this.newFile:', this.newFile);
-            console.log('this.modifiedFile:', this.modifiedFile);
+            this.process();
+            //console.log( 'this.allFile:', this.allFile );
         }
+    }, {
+        key: "process",
+        value: function process() {
+            var _this2 = this;
+
+            var p = this;
+
+            this.allFile.map(function (filepath, index) {
+                if (index) return;
+
+                _this2.tag = {};
+                _this2.template = [];
+                _this2.curCount = 0;
+                _this2.curFilepath = filepath;
+
+                _this2.curContent = _fsExtra2.default.readFileSync(filepath, { encoding: _this2.info.feuid.encoding || 'utf8' });
+
+                _this2.getTemplate();
+                _this2.getRoot();
+            });
+        }
+    }, {
+        key: "getTemplate",
+        value: function getTemplate() {
+            //console.log( this.content );
+            var curIndex = 0;
+            while (true) {
+                var tmpContent = this.curContent.slice(curIndex);
+                var startReg = /<div[^<\/]*?>/i;
+                var tmp = tmpContent.match(startReg);
+
+                if (!tmp) {
+                    break;
+                }
+
+                console.log(this.curFilepath);
+                console.log(curIndex, tmp.index);
+                //console.log( tmpContent );
+
+                var nextIndex = curIndex + tmp.index + 1;
+
+                var endIndex = this.matchEnd(nextIndex, startReg);
+
+                //console.log( 'endIndex:', endIndex );
+
+                console.log(this.curContent.slice(curIndex + tmp.index, endIndex));
+
+                curIndex = nextIndex;
+            }
+        }
+    }, {
+        key: "matchEnd",
+        value: function matchEnd(nextIndex, startReg) {
+            var r = 0;
+
+            var endContent = this.curContent.slice(nextIndex);
+            var tmpEnd = endContent.match(/<\/div>/i);
+
+            if (tmpEnd) {
+                var endMatch = this.curContent.slice(nextIndex, nextIndex + tmpEnd.index + 6);
+                //console.log( endMatch );
+                if (endMatch.match(startReg)) {
+                    r = this.matchEnd(nextIndex + tmpEnd.index + 6, startReg);
+                } else {
+                    r = nextIndex + tmpEnd.index + 6;
+                }
+            }
+
+            return r;
+        }
+    }, {
+        key: "getRoot",
+        value: function getRoot() {}
     }]);
 
     return ProjectReplaceVUE;
