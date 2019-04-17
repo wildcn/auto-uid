@@ -53,20 +53,18 @@ export default class Project {
     getChangeFiles(){
         let p = this;
 
-        let gitStatus, lines;
+        if( this.app.program.all ){
+            let globRe = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.+(${p.info.feuid.extension.join('|')})`;
 
+            p.allFile = glob.sync( globRe, {} );
+            console.log( 1 )
+
+            return;
+        } 
+
+        let gitStatus, lines;
         gitStatus = shell.exec( `cd '${this.info.currentRoot}' && git status`, { silent: true } );
         lines = gitStatus.stdout.split( '\n' );
-
-        if( this.app.program.all ){
-            let tmp = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.vue`;
-            console.log( 'is all' );
-            console.log( tmp );
-
-            glob( tmp, {}, function (er, files) {
-                console.log( files );
-            });
-        } 
 
         lines.map( ( item, index ) => {
             item = item.trim();

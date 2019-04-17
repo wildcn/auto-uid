@@ -94,21 +94,19 @@ var Project = function () {
         value: function getChangeFiles() {
             var p = this;
 
+            if (this.app.program.all) {
+                var globRe = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.+(" + p.info.feuid.extension.join('|') + ")";
+
+                p.allFile = glob.sync(globRe, {});
+                console.log(1);
+
+                return;
+            }
+
             var gitStatus = void 0,
                 lines = void 0;
-
             gitStatus = _shelljs2.default.exec("cd '" + this.info.currentRoot + "' && git status", { silent: true });
             lines = gitStatus.stdout.split('\n');
-
-            if (this.app.program.all) {
-                var tmp = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.vue";
-                console.log('is all');
-                console.log(tmp);
-
-                glob(tmp, {}, function (er, files) {
-                    console.log(files);
-                });
-            }
 
             lines.map(function (item, index) {
                 item = item.trim();
