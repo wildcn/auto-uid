@@ -17,6 +17,7 @@ var program = require('commander');
 program
     .version( packJSON.version )
     .option('-a, --all', '处理所有匹配的文件' )
+    .option('-s, --setup', '初始化项目配置，在根目录下生成feuid.js、package.json添加pre-commit勾子' )
     .option('-p, --path <path>', '自定义项目路径，默认为当前路径' )
     ;
 program.parse(process.argv);
