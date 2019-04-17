@@ -21,6 +21,8 @@ program.parse(process.argv);
 PROJECT_ROOT = program.path || PROJECT_ROOT;
 
 var projectInfo = resolveProjectInfo(PROJECT_ROOT);
+resolveConfig(projectInfo);
+setupPackage(projectInfo);
 
 PROJECT_ROOT = projectInfo.projectRoot;
 
@@ -28,6 +30,10 @@ require('babel-core/register');
 require("babel-polyfill");
 var init = require('./app').init;
 init(APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo);
+
+function setupPackage(r) {
+    if (!program.setup) return;
+}
 
 function resolveProjectInfo(proot) {
     var r = {};
@@ -52,9 +58,11 @@ function resolveProjectInfo(proot) {
         }
     }
 
+    return r;
+}
+
+function resolveConfig(r) {
     r.feuid = merge.all([{}, fs.existsSync(r.appRoot + '/feuid.config.js') ? require(r.appRoot + '/feuid.config.js') : {}, fs.existsSync(r.projectRoot + '/feuid.config.js') ? require(r.projectRoot + '/feuid.config.js') : {}, fs.existsSync(r.currentRoot + '/feuid.config.js') ? require(r.currentRoot + '/feuid.config.js') : {}], { arrayMerge: function arrayMerge(destinationArray, sourceArray, options) {
             return sourceArray;
         } });
-
-    return r;
 }
