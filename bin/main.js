@@ -40,8 +40,6 @@ if (program.auto) {
 function setupPackage(r) {
     if (!program.setup) return;
 
-    console.log('setup', program.setup);
-
     if (!r.package) {
         console.error('package.json not exists');
         return;
@@ -49,7 +47,6 @@ function setupPackage(r) {
 
     var pack = require(r.package);
     var install = [];
-    console.log(pack);
 
     if (!('feuid' in pack.dependencies || 'feuid' in pack.devDependencies)) {
         install.push('feuid');
@@ -58,7 +55,6 @@ function setupPackage(r) {
         install.push('pre-commit');
     }
 
-    console.log('install:', install);
     if (install.length) {
         installPack(install, r);
         //shell.sleep( 5 );
