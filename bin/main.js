@@ -15,7 +15,7 @@ var config = require(APP_ROOT + '/config.json');
 
 var program = require('commander');
 
-program.version(packJSON.version).option('-p, --path <path>', '设置项目路径');
+program.version(packJSON.version).option('-a, --all', '处理所有匹配的文件').option('-p, --path <path>', '设置项目路径');
 program.parse(process.argv);
 
 PROJECT_ROOT = program.path || PROJECT_ROOT;
@@ -33,6 +33,7 @@ function resolveProjectInfo(proot) {
     var r = {};
     r.projectRoot = proot;
     r.currentRoot = proot;
+    r.appRoot = APP_ROOT;
     r.packagePath = '';
 
     var tmpPath = proot;
@@ -51,7 +52,7 @@ function resolveProjectInfo(proot) {
         }
     }
 
-    r.feuid = merge.all([{}, fs.existsSync(r.projectRoot + '/feuid.js') ? require(r.projectRoot + '/feuid.js') : {}, fs.existsSync(r.currentRoot + '/feuid.js') ? require(r.currentRoot + '/feuid.js') : {}], { arrayMerge: function arrayMerge(destinationArray, sourceArray, options) {
+    r.feuid = merge.all([{}, fs.existsSync(r.appRoot + '/feuid.js') ? require(r.appRoot + '/feuid.js') : {}, fs.existsSync(r.projectRoot + '/feuid.js') ? require(r.projectRoot + '/feuid.js') : {}, fs.existsSync(r.currentRoot + '/feuid.js') ? require(r.currentRoot + '/feuid.js') : {}], { arrayMerge: function arrayMerge(destinationArray, sourceArray, options) {
             return sourceArray;
         } });
 

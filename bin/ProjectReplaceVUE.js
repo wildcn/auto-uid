@@ -76,11 +76,7 @@ var ProjectReplaceVUE = function (_Project) {
 
             var p = this;
 
-            console.log(this.allFile);
-
             this.allFile.map(function (filepath, index) {
-                if (index) return;
-
                 _this2.tag = {};
                 _this2.template = [];
                 _this2.curCount = 0;

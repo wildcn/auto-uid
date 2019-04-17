@@ -15,9 +15,7 @@ const warning = chalk.keyword('orange');
 const success = chalk.greenBright;
 const info = chalk.bold.blue;
 
-
 import Project from './Project.js';
-
 
 export default class ProjectReplaceVUE extends Project {
     constructor( app ){
@@ -42,11 +40,7 @@ export default class ProjectReplaceVUE extends Project {
     process(){
         let p = this;
 
-        console.log( this.allFile );
-
         this.allFile.map( ( filepath, index ) => {
-            if( index ) return ;
-
             this.tag = {};
             this.template = [];
             this.curCount = 0;

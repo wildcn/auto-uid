@@ -11,6 +11,8 @@ import shell from 'shelljs';
 
 import inquirer from 'inquirer';
 
+const glob = require( 'glob' );
+
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
 const success = chalk.greenBright;
@@ -28,13 +30,17 @@ export default class Project {
         this.modifiedFile = [];
         this.allFile = [];
 
+        this.info.feuid.dir.map( ( item, index ) => {
+            this.info.feuid.dir[index] = item.replace( /[\/]+$/, '' );
+        });
+        this.dirRe = new RegExp( `^(${this.info.feuid.dir.join('|')})\/`, 'i');
+
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
         this.fixRe = /^(\/|\\)/;
         this.extensionRe = new RegExp( `\\.(vue)$`, 'i' );
 
         this.init();
-
     }
 
     init() {
@@ -45,10 +51,22 @@ export default class Project {
     }
 
     getChangeFiles(){
-
-        let gitStatus = shell.exec( `cd '${this.info.currentRoot}' && git status`, { silent: true } );
-        let lines = gitStatus.stdout.split( '\n' );
         let p = this;
+
+        let gitStatus, lines;
+
+        gitStatus = shell.exec( `cd '${this.info.currentRoot}' && git status`, { silent: true } );
+        lines = gitStatus.stdout.split( '\n' );
+
+        if( this.app.program.all ){
+            let tmp = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.vue`;
+            console.log( 'is all' );
+            console.log( tmp );
+
+            glob( tmp, {}, function (er, files) {
+                console.log( files );
+            });
+        } 
 
         lines.map( ( item, index ) => {
             item = item.trim();
@@ -68,8 +86,9 @@ export default class Project {
 
         let fullpath = path.join( info.currentRoot, $1 );
         let filepath =  fullpath.replace( info.projectRoot, '' ).replace( this.fixRe, '' );
+
         if( this.extensionRe.test( $1 )
-            && info.feuid.dir.test( filepath )
+            && p.dirRe.test( filepath )
         ){
             ar.push( fullpath );
             p.allFile.push( fullpath );

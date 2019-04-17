@@ -48,6 +48,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var glob = require('glob');
+
 var error = _chalk2.default.bold.red;
 var warning = _chalk2.default.keyword('orange');
 var success = _chalk2.default.greenBright;
@@ -55,6 +57,8 @@ var info = _chalk2.default.bold.blue;
 
 var Project = function () {
     function Project(app) {
+        var _this = this;
+
         _classCallCheck(this, Project);
 
         this.app = app;
@@ -63,6 +67,11 @@ var Project = function () {
         this.newFile = [];
         this.modifiedFile = [];
         this.allFile = [];
+
+        this.info.feuid.dir.map(function (item, index) {
+            _this.info.feuid.dir[index] = item.replace(/[\/]+$/, '');
+        });
+        this.dirRe = new RegExp("^(" + this.info.feuid.dir.join('|') + ")/", 'i');
 
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
@@ -83,10 +92,23 @@ var Project = function () {
     }, {
         key: "getChangeFiles",
         value: function getChangeFiles() {
-
-            var gitStatus = _shelljs2.default.exec("cd '" + this.info.currentRoot + "' && git status", { silent: true });
-            var lines = gitStatus.stdout.split('\n');
             var p = this;
+
+            var gitStatus = void 0,
+                lines = void 0;
+
+            gitStatus = _shelljs2.default.exec("cd '" + this.info.currentRoot + "' && git status", { silent: true });
+            lines = gitStatus.stdout.split('\n');
+
+            if (this.app.program.all) {
+                var tmp = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.vue";
+                console.log('is all');
+                console.log(tmp);
+
+                glob(tmp, {}, function (er, files) {
+                    console.log(files);
+                });
+            }
 
             lines.map(function (item, index) {
                 item = item.trim();
@@ -107,7 +129,8 @@ var Project = function () {
 
             var fullpath = _path2.default.join(info.currentRoot, $1);
             var filepath = fullpath.replace(info.projectRoot, '').replace(this.fixRe, '');
-            if (this.extensionRe.test($1) && info.feuid.dir.test(filepath)) {
+
+            if (this.extensionRe.test($1) && p.dirRe.test(filepath)) {
                 ar.push(fullpath);
                 p.allFile.push(fullpath);
             }
