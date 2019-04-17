@@ -57,12 +57,12 @@ function resolveProjectInfo( proot ){
 
     r.feuid = merge.all( [
         {}
-        , fs.existsSync( `${r.appRoot}/feuid.js` ) 
-            ? require( `${r.appRoot}/feuid.js` ) : {}
-        , fs.existsSync( `${r.projectRoot}/feuid.js` ) 
-            ? require( `${r.projectRoot}/feuid.js` ) : {}
-        , fs.existsSync( `${r.currentRoot}/feuid.js` ) 
-            ? require( `${r.currentRoot}/feuid.js` ) : {} 
+        , fs.existsSync( `${r.appRoot}/feuid.config.js` ) 
+            ? require( `${r.appRoot}/feuid.config.js` ) : {}
+        , fs.existsSync( `${r.projectRoot}/feuid.config.js` ) 
+            ? require( `${r.projectRoot}/feuid.config.js` ) : {}
+        , fs.existsSync( `${r.currentRoot}/feuid.config.js` ) 
+            ? require( `${r.currentRoot}/feuid.config.js` ) : {} 
     ], { arrayMerge: (destinationArray, sourceArray, options) => sourceArray });
 
     return r;
