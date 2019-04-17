@@ -31,6 +31,7 @@ export default class Project {
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
         this.fixRe = /^(\/|\\)/;
+        this.extensionRe = new RegExp( `\\.(vue)$`, 'i' );
 
         this.init();
 
@@ -45,30 +46,31 @@ export default class Project {
 
     getChangeFiles(){
 
-        let gitStatus = shell.exec( `cd '${info.currentRoot}' && git status`, { silent: true } );
+        let gitStatus = shell.exec( `cd '${this.info.currentRoot}' && git status`, { silent: true } );
         let lines = gitStatus.stdout.split( '\n' );
         let p = this;
 
         lines.map( ( item, index ) => {
             item = item.trim();
-            item.replace( this.newRe, function( $0, $1 ){
-                fileReplaceAction( $0, $1, p.newFile ){
+            item.replace( p.newRe, function( $0, $1 ){
+                p.fileReplaceAction( $0, $1, p.newFile )
             });
-            item.replace( this.modifiedRe, function( $0, $1 ){
-                fileReplaceAction( $0, $1, p.modifiedFile ){
+
+            item.replace( p.modifiedRe, function( $0, $1 ){
+                p.fileReplaceAction( $0, $1, p.modifiedFile )
             });
         });
     }
 
     fileReplaceAction( $0, $1, ar ){
         let info = this.info;
+        let p = this;
 
         let fullpath = path.join( info.currentRoot, $1 );
         let filepath =  fullpath.replace( info.projectRoot, '' ).replace( this.fixRe, '' );
-        if( info.feuid.extension.test( $1 )
+        if( this.extensionRe.test( $1 )
             && info.feuid.dir.test( filepath )
         ){
-            //console.log( 'find new modified:', $1 );
             ar.push( fullpath );
             p.allFile.push( fullpath );
         }

@@ -33,6 +33,7 @@ export default class ProjectReplaceVUE extends Project {
         this.attrnameRe = new RegExp( `${this.info.feuid.attrname}[\\s]*?\\=`, 'i');
         this.fixEmptyRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`, 'ig');
         this.fixRepeatRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([^'"]*)?\\2`, 'ig');
+        this.firstSpaceRe = /^([\s]|>)/;
 
         this.getChangeFiles();
         this.process();
@@ -89,7 +90,10 @@ export default class ProjectReplaceVUE extends Project {
             let uid = '';
             //if( !/data-testid\=/i.test( $2 ) ){
             if( !p.attrnameRe.test( $2 ) ){
-                uid = ` ${info.feuid.attrname}="z${Uuid.create()}"`
+                uid = ` ${info.feuid.attrname}="${info.feuid.idprefix}${Uuid.create()}"`
+                if( !p.firstSpaceRe.test( $2 ) ){
+                    uid += ' ';
+                }
             }
             let r = `${$1}${uid}${$2}`;
             return r;
@@ -110,7 +114,18 @@ export default class ProjectReplaceVUE extends Project {
             }
             uuidObj[ $3 ]++;
         });
-        console.log( repeatObj );
+
+        for( let key in repeatObj ){
+            let fixRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")(${key})?\\2`, 'ig');
+            count = 0; 
+            content = content.replace( fixRe, function($0, $1, $2, $3){
+                if( count ){
+                    $3 = this.info.feuid.idprefix + Uuid.create();
+                }
+                count++;
+                return `${$1}${$2}${$3}${$2}`;
+            });
+        }
 
         return content;
     }
@@ -119,7 +134,7 @@ export default class ProjectReplaceVUE extends Project {
     fixEmpty( content ){
 
         content = content.replace( this.fixEmptyRe, function( $0, $1, $2, $3 ){
-            return `${$1}${$2}${Uuid.create()}${$2}`;
+            return `${$1}${$2}${this.info.feuid.idprefix}${Uuid.create()}${$2}`;
         });
 
         return content;

@@ -64,6 +64,11 @@ var Project = function () {
         this.modifiedFile = [];
         this.allFile = [];
 
+        this.newRe = /new[\s]+file:[\s]+(.*)/;
+        this.modifiedRe = /modified:[\s]+(.*)/;
+        this.fixRe = /^(\/|\\)/;
+        this.extensionRe = new RegExp("\\.(vue)$", 'i');
+
         this.init();
     }
 
@@ -78,36 +83,34 @@ var Project = function () {
     }, {
         key: "getChangeFiles",
         value: function getChangeFiles() {
-            var info = this.info;
 
-            var gitStatus = _shelljs2.default.exec("cd '" + info.currentRoot + "' && git status", { silent: true });
-
+            var gitStatus = _shelljs2.default.exec("cd '" + this.info.currentRoot + "' && git status", { silent: true });
             var lines = gitStatus.stdout.split('\n');
-
             var p = this;
 
             lines.map(function (item, index) {
                 item = item.trim();
-                item.replace(/new[\s]+file:[\s]+(.*)/, function ($0, $1) {
-                    var fullpath = _path2.default.join(info.currentRoot, $1);
-                    var filepath = fullpath.replace(info.projectRoot, '').replace(/^(\/|\\)/, '');
-
-                    if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
-                        //console.log( 'find new file:', $1 );
-                        p.newFile.push(fullpath);
-                        p.allFile.push(fullpath);
-                    }
+                item.replace(p.newRe, function ($0, $1) {
+                    p.fileReplaceAction($0, $1, p.newFile);
                 });
-                item.replace(/modified:[\s]+(.*)/, function ($0, $1) {
-                    var fullpath = _path2.default.join(info.currentRoot, $1);
-                    var filepath = fullpath.replace(info.projectRoot, '').replace(/^(\/|\\)/, '');
-                    if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
-                        //console.log( 'find new modified:', $1 );
-                        p.modifiedFile.push(fullpath);
-                        p.allFile.push(fullpath);
-                    }
+
+                item.replace(p.modifiedRe, function ($0, $1) {
+                    p.fileReplaceAction($0, $1, p.modifiedFile);
                 });
             });
+        }
+    }, {
+        key: "fileReplaceAction",
+        value: function fileReplaceAction($0, $1, ar) {
+            var info = this.info;
+            var p = this;
+
+            var fullpath = _path2.default.join(info.currentRoot, $1);
+            var filepath = fullpath.replace(info.projectRoot, '').replace(this.fixRe, '');
+            if (this.extensionRe.test($1) && info.feuid.dir.test(filepath)) {
+                ar.push(fullpath);
+                p.allFile.push(fullpath);
+            }
         }
     }]);
 
