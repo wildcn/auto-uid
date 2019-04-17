@@ -104,9 +104,7 @@ function installPack(install, r) {
         cmd = 'npm install ' + install.join(' ');
     }
 
-    console.log('cmd:', cmd);
     if (cmd) {
-        console.log(cmd);
         shell.exec('cd "' + r.projectRoot + '" && ' + cmd);
     }
 }
