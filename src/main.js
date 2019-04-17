@@ -24,6 +24,11 @@ program
     ;
 program.parse(process.argv);
 
+if( program.auto ){
+    program.setup = true;
+    program.full = true;
+}
+
 PROJECT_ROOT = program.path || PROJECT_ROOT;
 
 let projectInfo = resolveProjectInfo( PROJECT_ROOT );

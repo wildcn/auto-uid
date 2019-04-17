@@ -19,6 +19,11 @@ var program = require('commander');
 program.version(packJSON.version).option('-a, --auto', '使用 -s 初始化项目配置，并执行 -f 全量匹配并添加唯一ID').option('-s, --setup', '初始化项目配置，在根目录下生成feuid.js、package.json添加pre-commit勾子').option('-f, --full', '处理所有匹配的文件').option('-p, --path <path>', '自定义项目路径，默认为当前路径');
 program.parse(process.argv);
 
+if (program.auto) {
+    program.setup = true;
+    program.full = true;
+}
+
 PROJECT_ROOT = program.path || PROJECT_ROOT;
 
 var projectInfo = resolveProjectInfo(PROJECT_ROOT);
