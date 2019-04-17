@@ -29,6 +29,7 @@ PROJECT_ROOT = program.path || PROJECT_ROOT;
 let projectInfo = resolveProjectInfo( PROJECT_ROOT );
 resolveConfig( projectInfo )
 setupPackage( projectInfo );
+setupConfig( projectInfo );
 
 PROJECT_ROOT = projectInfo.projectRoot;
 
@@ -40,6 +41,23 @@ if( program.auto ){
     init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
 }else if( !program.setup ){
     init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+}
+
+function setupConfig( r ){
+    if( !program.setup ) return;
+    let projectConfig = `${r.projectRoot}/feuid.config.js`;
+    let modConfig = `${r.projectRoot}/node_modules/feuid/feuid.config.js`;
+    let appConfig = `${r.appRoot}/feuid.config.js`;
+
+    if( !fs.existsSync( projectConfig ) ){
+        let target = fs.existsSync( modConfig ) ? modConfig : '';
+        if( !target ){
+            target = fs.existsSync( appConfig ) ? appConfig : '';
+        }
+        if( target ){
+            fs.copyFileSync( target, projectConfig );
+        }
+    }
 }
 
 function setupPackage( r ){
