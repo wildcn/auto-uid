@@ -62,7 +62,8 @@ var ProjectReplaceVUE = function (_Project) {
             this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
 
             this.attrnameRe = new RegExp(this.info.feuid.attrname + "[\\s]*?\\=", 'i');
-            this.fixEmptyRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", 'i');
+            this.fixEmptyRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", 'ig');
+            this.fixRepeatRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([^'\"]*)?\\2", 'ig');
 
             this.getChangeFiles();
             this.process();
@@ -111,6 +112,9 @@ var ProjectReplaceVUE = function (_Project) {
             if (info.feuid.fixempty) {
                 content = this.fixEmpty(content);
             }
+            if (info.feuid.fixrepeat) {
+                content = this.fixRepeat(content);
+            }
             content = content.replace(p.tagContentRe, function ($0, $1, $2) {
                 var uid = '';
                 //if( !/data-testid\=/i.test( $2 ) ){
@@ -120,6 +124,24 @@ var ProjectReplaceVUE = function (_Project) {
                 var r = "" + $1 + uid + $2;
                 return r;
             });
+
+            return content;
+        }
+    }, {
+        key: "fixRepeat",
+        value: function fixRepeat(content) {
+
+            var count = 0;
+            var uuidObj = {};
+            var repeatObj = {};
+            content.replace(this.fixRepeatRe, function ($0, $1, $2, $3) {
+                uuidObj[$3] = uuidObj[$3] || 0;
+                if (uuidObj[$3]) {
+                    repeatObj[$3] = uuidObj[$3] + 1;
+                }
+                uuidObj[$3]++;
+            });
+            console.log(repeatObj);
 
             return content;
         }
