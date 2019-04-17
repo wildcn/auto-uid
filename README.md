@@ -2,7 +2,7 @@
 # feuid
 
 ## 工具的作用
-    .shp & .kml 生成 .pbf
+    
 
 ## 全局安装
     sudo npm install -g feuid
@@ -15,7 +15,7 @@
     feuid /var/www/your_project_root
 
 ## 参数配置文件 feuid.json
-	如果运行命令的目录有 feuid.json，工具会尝试读取JSON的配置参数，自动填充输入参数
+	如果运行命令的目录有 feuid.config.json，工具会尝试读取JSON的配置参数，自动填充输入参数
 
 ## feuid.json 说明
 	{
