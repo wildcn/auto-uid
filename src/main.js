@@ -4,6 +4,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const shell = require( 'shelljs' );
+require('shelljs-plugin-sleep');
 const merge = require('deepmerge')
 
 const APP_ROOT = path.resolve(__dirname, '..');
@@ -34,7 +35,12 @@ PROJECT_ROOT = projectInfo.projectRoot;
 require('babel-core/register');
 require("babel-polyfill");
 const init = require( './app' ).init;
-init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+
+if( program.auto ){
+    init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+}else if( !program.setup ){
+    init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+}
 
 function setupPackage( r ){
     if( !program.setup ) return;
@@ -47,8 +53,67 @@ function setupPackage( r ){
     }
 
     let pack = require( r.package );
+    let install = [];
     console.log( pack );
 
+    if( !( ( 'feuid' in pack.dependencies ) || 'feuid' in pack.devDependencies ) ){
+        install.push( 'feuid' );
+    }
+    if( !( ( 'pre-commit' in pack.dependencies ) || 'pre-commit' in pack.devDependencies ) ){
+        install.push( 'pre-commit' );
+    }
+
+    console.log( 'install:', install );
+    if( install.length ){
+        installPack( install, r );
+        //shell.sleep( 5 );
+        delete require.cache[require.resolve(r.package)]
+        pack = require( r.package );
+    }
+
+    if( !pack.scripts ){
+        pack.scripts = {};
+    }
+
+    let writePack = 0;
+
+    if( !( pack.scripts && pack.scripts.feuid ) ){
+        pack.scripts.feuid = 'node ./node_modules/feuid/bin/main.js';
+        writePack = 1;
+    }
+
+    if( !pack['pre-commit'] ){
+        pack['pre-commit'] = [ 'feuid'];
+        writePack = 1;
+    }
+    if( !pack['pre-commit'].toString().indexOf( 'feuid' ) > -1 ){
+        if( typeof pack['pre-commit'] == 'string' ){
+            pack['pre-commit'] += ',feuid';
+            writePack = 1;
+        }else if( typeof pack['pre-comit'] == 'array' ){
+            pack['pre-commit'].push( 'feuid' );
+            writePack = 1;
+        }
+    }
+
+    if( writePack ){
+        fs.writeFileSync( r.package, JSON.stringify( pack, null, 2 ), { encoding: projectInfo.feuid.encoding || 'utf8' } )
+    }
+}
+
+function installPack( install, r ){
+    let cmd = '';
+    if( shell.which( 'yarn' ) ){
+        cmd = `yarn add ${install.join(' ')}`
+    }else if( shell.which( 'npm' ) ){
+        cmd = `npm install ${install.join(' ')}`
+    }
+
+    console.log( 'cmd:', cmd );
+    if( cmd ){
+        console.log( cmd );
+        shell.exec( `cd "${r.projectRoot}" && ${cmd}` );
+    }
 }
 
 function resolveProjectInfo( proot ){

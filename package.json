@@ -38,6 +38,7 @@
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "commander": "^2.20.0",
+    "decache": "^4.5.1",
     "deepmerge": "^3.2.0",
     "figlet": "^1.2.0",
     "fs": "^0.0.1-security",
@@ -49,6 +50,7 @@
     "node-glob": "^1.2.0",
     "path": "^0.12.7",
     "shelljs": "^0.8.2",
+    "shelljs-plugin-sleep": "^0.2.0",
     "uuid-lib": "^0.0.6"
   }
 }
