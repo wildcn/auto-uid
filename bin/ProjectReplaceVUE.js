@@ -59,12 +59,14 @@ var ProjectReplaceVUE = function (_Project) {
             console.log(this.info);
             this.delimiter = '|||||';
             this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
-            this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
+            //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
+            this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
 
             this.attrnameRe = new RegExp(this.info.feuid.attrname + "[\\s]*?\\=", 'i');
             this.fixEmptyRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", 'ig');
             this.fixRepeatRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([^'\"]*)?\\2", 'ig');
             this.firstSpaceRe = /^([\s]|>)/;
+            this.lastSpaceRe = /[\s]$/;
 
             this.getChangeFiles();
             this.process();
@@ -112,16 +114,21 @@ var ProjectReplaceVUE = function (_Project) {
             if (info.feuid.fixrepeat) {
                 content = this.fixRepeat(content);
             }
-            content = content.replace(p.tagContentRe, function ($0, $1, $2) {
+            content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
                 var uid = '';
                 //if( !/data-testid\=/i.test( $2 ) ){
                 if (!p.attrnameRe.test($2)) {
-                    uid = " " + info.feuid.attrname + "=\"" + info.feuid.idprefix + Uuid.create() + "\"";
-                    if (!p.firstSpaceRe.test($2)) {
+                    uid = info.feuid.attrname + "=\"" + info.feuid.idprefix + Uuid.create() + "\"";
+                    if (!p.lastSpaceRe.test($2)) {
+                        uid = ' ' + uid;
+                    }
+                    /*
+                    if( !p.firstSpaceRe.test( $2 ) ){
                         uid += ' ';
                     }
+                    */
                 }
-                var r = "" + $1 + uid + $2;
+                var r = "" + $1 + $2 + uid + $3;
                 return r;
             });
 
