@@ -28,7 +28,12 @@ export default class Project {
         this.modifiedFile = [];
         this.allFile = [];
 
+        this.newRe = /new[\s]+file:[\s]+(.*)/;
+        this.modifiedRe = /modified:[\s]+(.*)/;
+        this.fixRe = /^(\/|\\)/;
+
         this.init();
+
     }
 
     init() {
@@ -39,41 +44,37 @@ export default class Project {
     }
 
     getChangeFiles(){
-        let info = this.info;
 
         let gitStatus = shell.exec( `cd '${info.currentRoot}' && git status`, { silent: true } );
-
-
         let lines = gitStatus.stdout.split( '\n' );
-
         let p = this;
 
         lines.map( ( item, index ) => {
             item = item.trim();
-            item.replace( /new[\s]+file:[\s]+(.*)/, function( $0, $1 ){
-                let fullpath = path.join( info.currentRoot, $1 );
-                let filepath =  fullpath.replace( info.projectRoot, '' );
-                if( info.feuid.extension.test( $1 )
-                    && info.feuid.dir.test( filepath )
-                ){
-                    //console.log( 'find new file:', $1 );
-                    p.newFile.push( fullpath );
-                    p.allFile.push( fullpath );
-                }
+            item.replace( this.newRe, function( $0, $1 ){
+                fileReplaceAction( $0, $1, p.newFile ){
             });
-            item.replace( /modified:[\s]+(.*)/, function( $0, $1 ){
-                let fullpath = path.join( info.currentRoot, $1 );
-                let filepath =  fullpath.replace( info.projectRoot, '' );
-                if( info.feuid.extension.test( $1 )
-                    && info.feuid.dir.test( filepath )
-                ){
-                    //console.log( 'find new modified:', $1 );
-                    p.modifiedFile.push( fullpath );
-                    p.allFile.push( fullpath );
-                }
+            item.replace( this.modifiedRe, function( $0, $1 ){
+                fileReplaceAction( $0, $1, p.modifiedFile ){
             });
         });
     }
+
+    fileReplaceAction( $0, $1, ar ){
+        let info = this.info;
+
+        let fullpath = path.join( info.currentRoot, $1 );
+        let filepath =  fullpath.replace( info.projectRoot, '' ).replace( this.fixRe, '' );
+        if( info.feuid.extension.test( $1 )
+            && info.feuid.dir.test( filepath )
+        ){
+            //console.log( 'find new modified:', $1 );
+            ar.push( fullpath );
+            p.allFile.push( fullpath );
+        }
+    }
+
+
 
 
 }

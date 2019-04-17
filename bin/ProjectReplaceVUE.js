@@ -36,6 +36,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var shell = require('shelljs');
 var glob = require("glob");
+var Guid = require('guid');
+var Uuid = require('uuid-lib');
 
 var error = _chalk2.default.bold.red;
 var warning = _chalk2.default.keyword('orange');
@@ -48,22 +50,22 @@ var ProjectReplaceVUE = function (_Project) {
     function ProjectReplaceVUE(app) {
         _classCallCheck(this, ProjectReplaceVUE);
 
-        var _this = _possibleConstructorReturn(this, (ProjectReplaceVUE.__proto__ || Object.getPrototypeOf(ProjectReplaceVUE)).call(this, app));
-
-        _this.delimiter = '|||||';
-        _this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
-        return _this;
+        return _possibleConstructorReturn(this, (ProjectReplaceVUE.__proto__ || Object.getPrototypeOf(ProjectReplaceVUE)).call(this, app));
     }
 
     _createClass(ProjectReplaceVUE, [{
         key: "init",
         value: function init() {
-            console.log(this.app.projectInfo);
+            console.log(this.info);
+            this.delimiter = '|||||';
+            this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
+            this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
+
+            this.attrnameRe = new RegExp(this.info.feuid.attrname + "[\\s]*?\\=", 'i');
+            this.fixEmptyRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", 'i');
 
             this.getChangeFiles();
-
             this.process();
-            //console.log( 'this.allFile:', this.allFile );
         }
     }, {
         key: "process",
@@ -71,6 +73,8 @@ var ProjectReplaceVUE = function (_Project) {
             var _this2 = this;
 
             var p = this;
+
+            console.log(this.allFile);
 
             this.allFile.map(function (filepath, index) {
                 if (index) return;
@@ -82,28 +86,49 @@ var ProjectReplaceVUE = function (_Project) {
 
                 _this2.curContent = _fsExtra2.default.readFileSync(filepath, { encoding: _this2.info.feuid.encoding || 'utf8' });
 
-                var tagInfo = _this2.getTag('template', filepath, 0);
+                //let tagInfo = this.getTag( 'div', filepath, 1 );
+                _this2.tagInfo = _this2.getTag('template', filepath, 0);
 
-                tagInfo.data.reverse().map(function (item) {
-                    console.log(item);
+                _this2.tagInfo.data.map(function (item) {
+                    //console.log( item );
                     var content = _this2.addDataId(item.innerTag.tagContent);
 
-                    console.log(content);
+                    _this2.tagInfo.newContent = [_this2.tagInfo.newContent.slice(0, item.innerTag.start), content, _this2.tagInfo.newContent.slice(item.innerTag.end)].join('');
                 });
 
-                _this2.getRoot();
+                if (_this2.tagInfo.content != _this2.tagInfo.newContent) {
+                    _fsExtra2.default.writeFileSync(filepath, _this2.tagInfo.newContent, { encoding: _this2.info.feuid.encoding || 'utf8' });
+                    shell.exec("cd '" + _this2.info.projectRoot + "' && git add " + filepath, { silent: true });
+                }
             });
         }
     }, {
         key: "addDataId",
         value: function addDataId(content) {
-            content = content.replace(/(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi, function ($0, $1, $2) {
+            var info = this.info;
+            var p = this;
+
+            if (info.feuid.fixempty) {
+                content = this.fixEmpty(content);
+            }
+            content = content.replace(p.tagContentRe, function ($0, $1, $2) {
                 var uid = '';
-                if (!/data-testid\=/i.test($2)) {
-                    uid = " data-testid=\"test\" ";
+                //if( !/data-testid\=/i.test( $2 ) ){
+                if (!p.attrnameRe.test($2)) {
+                    uid = " " + info.feuid.attrname + "=\"z" + Uuid.create() + "\"";
                 }
                 var r = "" + $1 + uid + $2;
                 return r;
+            });
+
+            return content;
+        }
+    }, {
+        key: "fixEmpty",
+        value: function fixEmpty(content) {
+
+            content = content.replace(this.fixEmptyRe, function ($0, $1, $2, $3) {
+                return "" + $1 + $2 + Uuid.create() + $2;
             });
 
             return content;
@@ -114,10 +139,18 @@ var ProjectReplaceVUE = function (_Project) {
             var matchAll = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
             var curIndex = 0;
-            var result = { content: this.curContent, data: [], filepath: filepath };
+            var result = {
+                content: this.curContent,
+                newContent: this.curContent,
+                data: [],
+                filepath: filepath
+            };
+
+            var startReg = new RegExp("<" + tag + "[^<\\/]*?>", 'i');
+            var endRe = new RegExp("<\\/" + tag + ">", 'i');
+
             while (true) {
                 var tmpContent = this.curContent.slice(curIndex);
-                var startReg = new RegExp("<" + tag + "[^<\\/]*?>", 'i');
                 var tmp = tmpContent.match(startReg);
 
                 if (!tmp) {
@@ -128,7 +161,7 @@ var ProjectReplaceVUE = function (_Project) {
 
                 var nextIndex = curIndex + tmp.index + 1;
 
-                var endResult = this.matchEnd(nextIndex, startReg, new RegExp("<\\/" + tag + ">", 'i'), tag.length + 3);
+                var endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
                 var endIndex = endResult.end;
 
                 /*
@@ -149,7 +182,7 @@ var ProjectReplaceVUE = function (_Project) {
                         }
                     };
                     data.innerTag.tagContent = this.curContent.slice(data.innerTag.start, data.innerTag.end);
-                    result.data.push(data);
+                    result.data.unshift(data);
                 }
 
                 curIndex = nextIndex;
@@ -180,9 +213,6 @@ var ProjectReplaceVUE = function (_Project) {
 
             return r;
         }
-    }, {
-        key: "getRoot",
-        value: function getRoot() {}
     }]);
 
     return ProjectReplaceVUE;

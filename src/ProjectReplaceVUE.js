@@ -7,6 +7,8 @@ import clear from 'clear';
 
 const shell = require( 'shelljs' );
 const glob = require("glob");
+const Guid = require( 'guid' );
+const Uuid = require( 'uuid-lib' );
 
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
@@ -16,25 +18,29 @@ const info = chalk.bold.blue;
 
 import Project from './Project.js';
 
+
 export default class ProjectReplaceVUE extends Project {
     constructor( app ){
         super( app );
-
-        this.delimiter = '|||||';
-        this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
     }
 
     init() {
-        console.log( this.app.projectInfo );
+        console.log( this.info );
+        this.delimiter = '|||||';
+        this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
+        this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
+
+        this.attrnameRe = new RegExp( `${this.info.feuid.attrname}[\\s]*?\\=`, 'i');
+        this.fixEmptyRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`, 'i');
 
         this.getChangeFiles();
-
         this.process();
-        //console.log( 'this.allFile:', this.allFile );
     }
 
     process(){
         let p = this;
+
+        console.log( this.allFile );
 
         this.allFile.map( ( filepath, index ) => {
             if( index ) return ;
@@ -46,24 +52,40 @@ export default class ProjectReplaceVUE extends Project {
 
             this.curContent = fs.readFileSync( filepath, { encoding: this.info.feuid.encoding || 'utf8' } );
 
-            let tagInfo = this.getTag( 'template', filepath, 0 );
+            //let tagInfo = this.getTag( 'div', filepath, 1 );
+            this.tagInfo = this.getTag( 'template', filepath, 0 );
 
-            tagInfo.data.reverse().map( item => {
-                console.log( item );
+            this.tagInfo.data.map( item => {
+                //console.log( item );
                 let content = this.addDataId( item.innerTag.tagContent );
-
-                console.log( content );
+                
+                this.tagInfo.newContent =  [
+                    this.tagInfo.newContent.slice( 0, item.innerTag.start )
+                    , content
+                    , this.tagInfo.newContent.slice( item.innerTag.end )
+                ].join('');
             });
 
-            this.getRoot();
+            if( this.tagInfo.content != this.tagInfo.newContent ){
+                fs.writeFileSync( filepath, this.tagInfo.newContent, { encoding: this.info.feuid.encoding || 'utf8' } )
+                shell.exec( `cd '${this.info.projectRoot}' && git add ${filepath}`, { silent: true } )
+            }
+
         });
     }
 
     addDataId( content ){
-        content = content.replace( /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi, function( $0, $1, $2 ){
+        let info = this.info;
+        let p = this;
+
+        if( info.feuid.fixempty ){
+            content = this.fixEmpty( content );
+        }
+        content = content.replace( p.tagContentRe, function( $0, $1, $2 ){
             let uid = '';
-            if( !/data-testid\=/i.test( $2 ) ){
-                uid = ` data-testid="test" `
+            //if( !/data-testid\=/i.test( $2 ) ){
+            if( !p.attrnameRe.test( $2 ) ){
+                uid = ` ${info.feuid.attrname}="z${Uuid.create()}"`
             }
             let r = `${$1}${uid}${$2}`;
             return r;
@@ -72,12 +94,29 @@ export default class ProjectReplaceVUE extends Project {
         return content;
     }
 
+    fixEmpty( content ){
+
+        content = content.replace( this.fixEmptyRe, function( $0, $1, $2, $3 ){
+            return `${$1}${$2}${Uuid.create()}${$2}`;
+        });
+
+        return content;
+    }
+
     getTag( tag, filepath, matchAll = false ){
         let curIndex = 0;
-        let result = { content: this.curContent, data: [], filepath: filepath };
+        let result = { 
+            content: this.curContent
+            , newContent: this.curContent
+            , data: []
+            , filepath: filepath 
+        };
+
+        let startReg = new RegExp( `<${tag}[^<\\/]*?>`, 'i' );
+        let endRe = new RegExp( `<\\/${tag}>`, 'i' );
+
         while( true ){
             let tmpContent = this.curContent.slice( curIndex );
-            let startReg = new RegExp( `<${tag}[^<\\/]*?>`, 'i' );
             let tmp = tmpContent.match( startReg  );
 
             if( !tmp ){
@@ -88,7 +127,7 @@ export default class ProjectReplaceVUE extends Project {
 
             let nextIndex = curIndex + tmp.index + 1;
 
-            let endResult = this.matchEnd( nextIndex, startReg, new RegExp( `<\\/${tag}>`, 'i' ), tag.length + 3 );
+            let endResult = this.matchEnd( nextIndex, startReg, endRe, tag.length + 3 );
             let endIndex = endResult.end;
 
             /*
@@ -109,7 +148,7 @@ export default class ProjectReplaceVUE extends Project {
                     }
                 };
                 data.innerTag.tagContent = this.curContent.slice( data.innerTag.start, data.innerTag.end );
-                result.data.push( data );
+                result.data.unshift( data );
             }
 
             curIndex = nextIndex;
@@ -138,9 +177,6 @@ export default class ProjectReplaceVUE extends Project {
         }
 
         return r;
-    }
-
-    getRoot(){
     }
 
 }

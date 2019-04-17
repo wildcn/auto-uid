@@ -90,7 +90,8 @@ var Project = function () {
                 item = item.trim();
                 item.replace(/new[\s]+file:[\s]+(.*)/, function ($0, $1) {
                     var fullpath = _path2.default.join(info.currentRoot, $1);
-                    var filepath = fullpath.replace(info.projectRoot, '');
+                    var filepath = fullpath.replace(info.projectRoot, '').replace(/^(\/|\\)/, '');
+
                     if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
                         //console.log( 'find new file:', $1 );
                         p.newFile.push(fullpath);
@@ -99,7 +100,7 @@ var Project = function () {
                 });
                 item.replace(/modified:[\s]+(.*)/, function ($0, $1) {
                     var fullpath = _path2.default.join(info.currentRoot, $1);
-                    var filepath = fullpath.replace(info.projectRoot, '');
+                    var filepath = fullpath.replace(info.projectRoot, '').replace(/^(\/|\\)/, '');
                     if (info.feuid.extension.test($1) && info.feuid.dir.test(filepath)) {
                         //console.log( 'find new modified:', $1 );
                         p.modifiedFile.push(fullpath);
