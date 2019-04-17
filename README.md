@@ -14,9 +14,9 @@
 ### 方法2: 使用 feuid 路径, 支持相对路径
     feuid /var/www/your_project_root
 
-## 参数配置文件 feuid.json
+## 参数配置文件 feuid.config.json
 	如果运行命令的目录有 feuid.config.json，工具会尝试读取JSON的配置参数，自动填充输入参数
 
-## feuid.json 说明
+## feuid.config.json 说明
 	{
 	}
