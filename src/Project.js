@@ -53,7 +53,7 @@ export default class Project {
     getChangeFiles(){
         let p = this;
 
-        if( this.app.program.all ){
+        if( this.app.program.full ){
             let globRe = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.+(${p.info.feuid.extension.join('|')})`;
 
             p.allFile = glob.sync( globRe, {} );

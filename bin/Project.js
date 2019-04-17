@@ -94,7 +94,7 @@ var Project = function () {
         value: function getChangeFiles() {
             var p = this;
 
-            if (this.app.program.all) {
+            if (this.app.program.full) {
                 var globRe = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.+(" + p.info.feuid.extension.join('|') + ")";
 
                 p.allFile = glob.sync(globRe, {});

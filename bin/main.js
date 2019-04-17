@@ -15,7 +15,7 @@ var config = require(APP_ROOT + '/config.json');
 
 var program = require('commander');
 
-program.version(packJSON.version).option('-a, --all', '处理所有匹配的文件').option('-s, --setup', '初始化项目配置，在根目录下生成feuid.js、package.json添加pre-commit勾子').option('-p, --path <path>', '自定义项目路径，默认为当前路径');
+program.version(packJSON.version).option('-a, --auto', '使用 -s 初始化项目配置，并执行 -f 全量匹配并添加唯一ID').option('-s, --setup', '初始化项目配置，在根目录下生成feuid.js、package.json添加pre-commit勾子').option('-f, --full', '处理所有匹配的文件').option('-p, --path <path>', '自定义项目路径，默认为当前路径');
 program.parse(process.argv);
 
 PROJECT_ROOT = program.path || PROJECT_ROOT;
@@ -33,6 +33,16 @@ init(APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo);
 
 function setupPackage(r) {
     if (!program.setup) return;
+
+    console.log('setup', program.setup);
+
+    if (!r.package) {
+        console.error('package.json not exists');
+        return;
+    }
+
+    var pack = require(r.package);
+    console.log(pack);
 }
 
 function resolveProjectInfo(proot) {
@@ -40,14 +50,14 @@ function resolveProjectInfo(proot) {
     r.projectRoot = proot;
     r.currentRoot = proot;
     r.appRoot = APP_ROOT;
-    r.packagePath = '';
+    r.package = '';
 
     var tmpPath = proot;
     while (true) {
         var tmpFile = path.join(tmpPath, 'package.json');
 
         if (fs.existsSync(tmpFile)) {
-            r.packagePath = tmpFile;
+            r.package = tmpFile;
             r.projectRoot = tmpPath;
             break;
         } else {
