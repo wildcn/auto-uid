@@ -55,7 +55,7 @@ var ProjectReplaceVUE = function (_Project) {
     _createClass(ProjectReplaceVUE, [{
         key: "init",
         value: function init() {
-            console.log(this.info);
+            //console.log( this.info );
             this.delimiter = '|||||';
             this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
             //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
@@ -100,6 +100,7 @@ var ProjectReplaceVUE = function (_Project) {
                 });
 
                 if (_this2.tagInfo.content != _this2.tagInfo.newContent) {
+                    console.log(success('feuid update file:'), success(filepath));
                     _fsExtra2.default.writeFileSync(filepath, _this2.tagInfo.newContent, { encoding: _this2.info.feuid.encoding || 'utf8' });
                     shell.exec("cd '" + _this2.info.projectRoot + "' && git add " + filepath, { silent: true });
                 }
@@ -206,7 +207,7 @@ var ProjectReplaceVUE = function (_Project) {
                     break;
                 }
 
-                console.log(this.curFilepath);
+                //console.log( this.curFilepath );
 
                 var nextIndex = curIndex + tmp.index + 1;
 

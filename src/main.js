@@ -1,5 +1,11 @@
 #! /usr/bin/env node
 
+import chalk from 'chalk';
+const error = chalk.bold.red;
+const warning = chalk.keyword('orange');
+const success = chalk.greenBright;
+const info = chalk.bold.blue;
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -128,7 +134,8 @@ function installPack( install, r ){
     }
 
     if( cmd ){
-        console.log( cmd );
+        console.log();
+        console.log( info( cmd ) );
         console.log();
         shell.exec( `cd "${r.projectRoot}" && ${cmd}` );
     }

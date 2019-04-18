@@ -22,7 +22,7 @@ export default class ProjectReplaceVUE extends Project {
     }
 
     init() {
-        console.log( this.info );
+        //console.log( this.info );
         this.delimiter = '|||||';
         this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
         //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
@@ -68,6 +68,7 @@ export default class ProjectReplaceVUE extends Project {
             });
 
             if( this.tagInfo.content != this.tagInfo.newContent ){
+                console.log( success( 'feuid update file:' ), success( filepath ) );
                 fs.writeFileSync( filepath, this.tagInfo.newContent, { encoding: this.info.feuid.encoding || 'utf8' } )
                 shell.exec( `cd '${this.info.projectRoot}' && git add ${filepath}`, { silent: true } )
             }
@@ -170,7 +171,7 @@ export default class ProjectReplaceVUE extends Project {
                 break;
             }
 
-            console.log( this.curFilepath );
+            //console.log( this.curFilepath );
 
             let nextIndex = curIndex + tmp.index + 1;
 

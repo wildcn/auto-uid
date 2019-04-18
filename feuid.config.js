@@ -9,7 +9,7 @@ let result = {
     , "fixempty": true
     , "fixrepeat": true
     , "idprefix": "fe"
-    , "ignoretag": [ "v-hover", "template" ]
+    , "ignoretag": [ "v-hover", "template", "el-table-column" ]
 };
 
 module.exports = result;

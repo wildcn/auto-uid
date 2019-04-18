@@ -1,6 +1,17 @@
 #! /usr/bin/env node
 'use strict';
 
+var _chalk = require('chalk');
+
+var _chalk2 = _interopRequireDefault(_chalk);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var error = _chalk2.default.bold.red;
+var warning = _chalk2.default.keyword('orange');
+var success = _chalk2.default.greenBright;
+var info = _chalk2.default.bold.blue;
+
 var fs = require('fs');
 var os = require('os');
 var path = require('path');
@@ -123,7 +134,8 @@ function installPack(install, r) {
     }
 
     if (cmd) {
-        console.log(cmd);
+        console.log();
+        console.log(info(cmd));
         console.log();
         shell.exec('cd "' + r.projectRoot + '" && ' + cmd);
     }

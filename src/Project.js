@@ -44,7 +44,7 @@ export default class Project {
     }
 
     initMethod() {
-        console.log( 'initMethod', Date.now() );
+        //console.log( 'initMethod', Date.now() );
     }
 
     getChangeFiles(){
@@ -54,7 +54,7 @@ export default class Project {
             let globRe = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.+(${p.info.feuid.extension.join('|')})`;
 
             p.allFile = glob.sync( globRe, {} );
-            console.log( 1 )
+            //console.log( 1 )
 
             return;
         } 
