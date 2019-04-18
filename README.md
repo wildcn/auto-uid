@@ -47,4 +47,15 @@
 
 ## feuid.config.js 说明
 	{
+	    "extension": [ 'vue' ]         //需要处理的文件后缀名
+	    , "language": "vue"            //处理标签的前端框架，目前只支持 vue, 未来会支持 react、angular
+	    , "repository": "git"          //代码存储的仓库类型，目前只支持 git, 未来会添加 svn 支持
+	    , "dir": [ 'src' ]             //需要处理唯一ID的目录，默认为 src
+	    , "encoding": "utf8"           //项目中的文件编辑
+	    , "attrname": "data-testid"    //唯一ID的属性名
+	    , "fixempty": true             //如果唯一ID属性为空自动修复
+	    , "fixrepeat": true            //如果唯一ID重复自动去重
+	    , "idprefix": "fe"             //唯一ID的前缀名
+	    //忽略处理的标签名
+	    , "ignoretag": [ "v-hover", "template", "el-table-column" ]   
 	}
