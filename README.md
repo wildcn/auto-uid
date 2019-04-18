@@ -19,9 +19,11 @@
     sudo npm install -g feuid
 
 ## 使用说明
-### 自动设置与处理所有文件指令: feuid -auto 
+### 设置勾子与处理所有文件指令: feuid -auto 
     cd projectRoot && feuid -auto
-
+    
+    //feuid -auto = feuid -setup && feuid -full
+    
 ## 参数配置文件 feuid.config.js
 	如果运行命令的目录有 feuid.config.js，工具会尝试读取JSON的配置参数，自动填充输入参数
 
