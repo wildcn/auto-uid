@@ -1,6 +1,6 @@
 {
   "name": "feuid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "frontend unique id",
   "main": "src/main.js",
   "bin": {
@@ -35,8 +35,8 @@
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0"
-  }
-  , "dependencies": {
+  },
+  "dependencies": {
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "commander": "^2.20.0",
