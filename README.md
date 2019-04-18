@@ -13,7 +13,6 @@
     * 使用 git 管理的项目
     * 使用 npm package.json 安装依赖的前端项目
     * 使用 vue 框架的前端项目
-    <strike>*使用 react 框架的前端项目</strike>
 
 ## 全局安装
     sudo npm install -g feuid
