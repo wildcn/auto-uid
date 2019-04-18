@@ -25,7 +25,7 @@
     //feuid -auto = feuid -setup && feuid -full
     
 ## 参数配置文件 feuid.config.js
-	如果运行命令的目录有 feuid.config.js，工具会尝试读取JSON的配置参数，自动填充输入参数
+	如果运行命令的项目根目录有 feuid.config.js，工具会自动读取配置参数
 
 ## feuid.config.js 说明
 	{
