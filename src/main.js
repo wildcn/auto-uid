@@ -138,6 +138,8 @@ function installPack( install, r ){
         console.log( info( cmd ) );
         console.log();
         shell.exec( `cd "${r.projectRoot}" && ${cmd}` );
+    }else{
+        console.log( error( 'npm and yarn not exists' ) );
     }
 }
 
