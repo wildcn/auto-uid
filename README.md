@@ -19,10 +19,17 @@
     sudo npm install -g feuid
 
 ## 使用说明
-### 设置勾子与处理所有文件指令: feuid -auto 
+### 设置提交勾子与处理所有文件指令: feuid -auto 
     cd projectRoot && feuid -auto
     
-    //feuid -auto = feuid -setup && feuid -full
+    # feuid -auto = feuid -setup && feuid -full
+    
+### 设置提交勾子指令: feuid -setup 
+    cd projectRoot && feuid -setup
+    
+    # 这个指令会自动添加2个npm模块 feuid、precommit
+    # 并在 package.json 的 scripts 添加 feuid 指令
+    # 和 package.json 添加 pre-commit: ["feuid"] 设置
     
 ## 参数配置文件 feuid.config.js
 	如果运行命令的项目根目录有 feuid.config.js，工具会自动读取配置参数
