@@ -2,7 +2,6 @@
 # feuid
 
 ## 使用说明
-
     提交代码自动添加 唯一ID 属性
 
     使用原理：git commit 时使用 pre-commit 勾子对已经 git add 的文件里的所有 vue tag 添加唯一ID属性
@@ -11,7 +10,9 @@
     
 ## 适合范围
     * 使用 git 管理的项目
+    
     * 使用 npm package.json 安装依赖的前端项目
+    
     * 使用 vue 框架的前端项目
 
 ## 全局安装
