@@ -7,7 +7,7 @@ import clear from 'clear';
 
 const shell = require( 'shelljs' );
 const glob = require("glob");
-const Uuid = require( 'uuid-lib' );
+const Uuid = require( 'uuid/v1' );
 
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
@@ -96,7 +96,7 @@ export default class ProjectReplaceVUE extends Project {
             }
 
             if( !p.attrnameRe.test( $2 ) ){
-                uid = `${info.feuid.attrname}="${info.feuid.idprefix}${Uuid.create()}"`
+                uid = `${info.feuid.attrname}="${info.feuid.idprefix}${p.getUuid()}"`
                 if( !p.lastSpaceRe.test( $2 ) ){
                     uid = ' ' + uid;
                 }
@@ -118,6 +118,7 @@ export default class ProjectReplaceVUE extends Project {
         let count = 0;
         let uuidObj = {};
         let repeatObj = {};
+        let p = this;
         content.replace( this.fixRepeatRe, function( $0, $1, $2, $3 ){
             uuidObj[ $3 ] = uuidObj[ $3 ] || 0;
             if( uuidObj[ $3 ] ){
@@ -131,7 +132,7 @@ export default class ProjectReplaceVUE extends Project {
             count = 0; 
             content = content.replace( fixRe, function($0, $1, $2, $3){
                 if( count ){
-                    $3 = this.info.feuid.idprefix + Uuid.create();
+                    $3 = this.info.feuid.idprefix + p.getUuid();
                 }
                 count++;
                 return `${$1}${$2}${$3}${$2}`;
@@ -143,9 +144,10 @@ export default class ProjectReplaceVUE extends Project {
 
 
     fixEmpty( content ){
+        let p = this;
 
         content = content.replace( this.fixEmptyRe, function( $0, $1, $2, $3 ){
-            return `${$1}${$2}${this.info.feuid.idprefix}${Uuid.create()}${$2}`;
+            return `${$1}${$2}${this.info.feuid.idprefix}${p.getUuid()}${$2}`;
         });
 
         return content;
@@ -225,6 +227,10 @@ export default class ProjectReplaceVUE extends Project {
         }
 
         return r;
+    }
+
+    getUuid(){
+        return Uuid().replace( /\-/g, '' );
     }
 
 }

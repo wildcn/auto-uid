@@ -36,7 +36,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var shell = require('shelljs');
 var glob = require("glob");
-var Uuid = require('uuid-lib');
+var Uuid = require('uuid/v1');
 
 var error = _chalk2.default.bold.red;
 var warning = _chalk2.default.keyword('orange');
@@ -128,7 +128,7 @@ var ProjectReplaceVUE = function (_Project) {
                 }
 
                 if (!p.attrnameRe.test($2)) {
-                    uid = info.feuid.attrname + "=\"" + info.feuid.idprefix + Uuid.create() + "\"";
+                    uid = info.feuid.attrname + "=\"" + info.feuid.idprefix + p.getUuid() + "\"";
                     if (!p.lastSpaceRe.test($2)) {
                         uid = ' ' + uid;
                     }
@@ -151,6 +151,7 @@ var ProjectReplaceVUE = function (_Project) {
             var count = 0;
             var uuidObj = {};
             var repeatObj = {};
+            var p = this;
             content.replace(this.fixRepeatRe, function ($0, $1, $2, $3) {
                 uuidObj[$3] = uuidObj[$3] || 0;
                 if (uuidObj[$3]) {
@@ -164,7 +165,7 @@ var ProjectReplaceVUE = function (_Project) {
                 count = 0;
                 content = content.replace(fixRe, function ($0, $1, $2, $3) {
                     if (count) {
-                        $3 = this.info.feuid.idprefix + Uuid.create();
+                        $3 = this.info.feuid.idprefix + p.getUuid();
                     }
                     count++;
                     return "" + $1 + $2 + $3 + $2;
@@ -176,9 +177,10 @@ var ProjectReplaceVUE = function (_Project) {
     }, {
         key: "fixEmpty",
         value: function fixEmpty(content) {
+            var p = this;
 
             content = content.replace(this.fixEmptyRe, function ($0, $1, $2, $3) {
-                return "" + $1 + $2 + this.info.feuid.idprefix + Uuid.create() + $2;
+                return "" + $1 + $2 + this.info.feuid.idprefix + p.getUuid() + $2;
             });
 
             return content;
@@ -262,6 +264,11 @@ var ProjectReplaceVUE = function (_Project) {
             }
 
             return r;
+        }
+    }, {
+        key: "getUuid",
+        value: function getUuid() {
+            return Uuid().replace(/\-/g, '');
         }
     }]);
 

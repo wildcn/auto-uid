@@ -127,7 +127,7 @@ function setupPackage(r) {
 
 function installPack(install, r) {
     var cmd = '';
-    if (shell.which('yarn')) {
+    if (false && shell.which('yarn')) {
         cmd = 'yarn add ' + install.join(' ');
     } else if (shell.which('npm')) {
         cmd = 'npm install ' + install.join(' ');
