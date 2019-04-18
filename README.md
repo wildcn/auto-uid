@@ -2,7 +2,7 @@
 # feuid
 
 ## 使用说明
-    git commit 时使用 pre-commit 勾子对已经 add 的文件添加唯一ID属性
+    git commit 时使用 pre-commit 勾子对已经 add 的文件里的vue 添加唯一ID属性
     
 ## 适合范围
     * 使用 git 管理的项目
