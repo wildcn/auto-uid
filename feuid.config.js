@@ -9,6 +9,7 @@ let result = {
     , "fixempty": true
     , "fixrepeat": true
     , "idprefix": "fe"
+    , "ignoretag": [ "v-hover" ]
 };
 
 module.exports = result;

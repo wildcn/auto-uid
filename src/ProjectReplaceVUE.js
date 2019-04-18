@@ -34,6 +34,10 @@ export default class ProjectReplaceVUE extends Project {
         this.firstSpaceRe = /^([\s]|>)/;
         this.lastSpaceRe = /[\s]$/;
 
+        if( this.info.feuid.ignoretag && this.info.feuid.ignoretag.length ){
+            this.ignoreTagRe = new RegExp( `^<(${this.info.feuid.ignoretag.join('|')})\\b`, 'i');
+        }
+
         this.getChangeFiles();
         this.process();
     }
@@ -84,6 +88,12 @@ export default class ProjectReplaceVUE extends Project {
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
             let uid = '';
             //if( !/data-testid\=/i.test( $2 ) ){
+            let r = `${$1}${$2}${uid}${$3}`;
+
+            if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
+                return r;
+            }
+
             if( !p.attrnameRe.test( $2 ) ){
                 uid = `${info.feuid.attrname}="${info.feuid.idprefix}${Uuid.create()}"`
                 if( !p.lastSpaceRe.test( $2 ) ){
@@ -95,7 +105,7 @@ export default class ProjectReplaceVUE extends Project {
                 }
                 */
             }
-            let r = `${$1}${$2}${uid}${$3}`;
+            r = `${$1}${$2}${uid}${$3}`;
             return r;
         });
 
