@@ -15,15 +15,12 @@
     
     * 使用 vue 框架的前端项目
 
-## 全局安装
+## 安装全局指令
     sudo npm install -g feuid
 
-## 使用
-### 方法1: 切换到项目根目录, 然后执行命令 feuid
-    cd projectRoot && feuid
-
-### 方法2: 使用 feuid 路径, 支持相对路径
-    feuid /var/www/your_project_root
+## 使用说明
+### 自动设置与处理所有文件指令: feuid -auto 
+    cd projectRoot && feuid -audo
 
 ## 参数配置文件 feuid.config.js
 	如果运行命令的目录有 feuid.config.js，工具会尝试读取JSON的配置参数，自动填充输入参数
