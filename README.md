@@ -2,7 +2,12 @@
 # feuid
 
 ## 使用说明
-    git commit 时使用 pre-commit 勾子对已经 git add 的文件里的所有 vue tag 添加唯一ID属性
+
+    提交代码自动添加 唯一ID 属性
+
+    使用原理：git commit 时使用 pre-commit 勾子对已经 git add 的文件里的所有 vue tag 添加唯一ID属性
+    
+    解决疼点：UI 自动化测试时，页面上标签的标识变更导致UI测试用例需要重写, feuid 主要为了减少ID变更造成的影响
     
 ## 适合范围
     * 使用 git 管理的项目
