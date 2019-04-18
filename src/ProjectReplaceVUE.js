@@ -7,7 +7,7 @@ import clear from 'clear';
 
 const shell = require( 'shelljs' );
 const glob = require("glob");
-const Uuid = require( 'uuid/v1' );
+const Uuid = require( 'uuid/v4' );
 
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');
