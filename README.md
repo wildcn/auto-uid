@@ -54,9 +54,9 @@
 	    , "dir": [ 'src' ]             //需要处理唯一ID的目录，默认为 src
 	    , "encoding": "utf8"           //项目中的文件编码
 	    , "attrname": "data-testid"    //唯一ID的属性名
+	    , "idprefix": "fe"             //唯一ID属性值的前缀名
 	    , "fixempty": true             //如果唯一ID属性为空自动修复
 	    , "fixrepeat": true            //如果唯一ID重复自动去重
-	    , "idprefix": "fe"             //唯一ID的前缀名
 	    //忽略处理的标签名
 	    , "ignoretag": [ "v-hover", "template", "el-table-column" ]   
 	}
