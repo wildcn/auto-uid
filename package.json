@@ -32,11 +32,11 @@
   "homepage": "https://github.com/hnjd-fe/feuid#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0"
   },
   "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0",
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "commander": "^2.20.0",
