@@ -18,7 +18,7 @@
 ## 安装全局指令
     sudo npm install -g feuid
 
-## 使用说明
+## 操作说明
 ### 设置提交勾子与处理所有文件指令: feuid -auto 
     cd projectRoot && feuid -auto
     
