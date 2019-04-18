@@ -36,7 +36,7 @@
 ### 处理所有文件指令: feuid --full 
     cd projectRoot && feuid --full
     
-    # 处理所有符合条件的文档
+    # 处理所有符合条件的文件
     
 ### 显示帮助指令: feuid --help
     feuid --help
