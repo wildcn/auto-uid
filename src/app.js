@@ -4,11 +4,8 @@ import path from "path";
 
 import chalk from 'chalk';
 import clear from 'clear';
-import figlet from 'figlet';
 
 import shell from 'shelljs';
-
-import inquirer from 'inquirer';
 
 const error = chalk.bold.red;
 const warning = chalk.keyword('orange');

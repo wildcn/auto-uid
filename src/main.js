@@ -4,7 +4,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const shell = require( 'shelljs' );
-require('shelljs-plugin-sleep');
 const merge = require('deepmerge')
 
 const APP_ROOT = path.resolve(__dirname, '..');

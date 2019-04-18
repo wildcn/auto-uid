@@ -36,7 +36,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var shell = require('shelljs');
 var glob = require("glob");
-var Guid = require('guid');
 var Uuid = require('uuid-lib');
 
 var error = _chalk2.default.bold.red;

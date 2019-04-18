@@ -24,17 +24,9 @@ var _clear = require("clear");
 
 var _clear2 = _interopRequireDefault(_clear);
 
-var _figlet = require("figlet");
-
-var _figlet2 = _interopRequireDefault(_figlet);
-
 var _shelljs = require("shelljs");
 
 var _shelljs2 = _interopRequireDefault(_shelljs);
-
-var _inquirer = require("inquirer");
-
-var _inquirer2 = _interopRequireDefault(_inquirer);
 
 var _constant = require("./data/constant.js");
 

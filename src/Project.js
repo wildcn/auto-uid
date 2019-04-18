@@ -5,11 +5,8 @@ import path from "path";
 
 import chalk from 'chalk';
 import clear from 'clear';
-import figlet from 'figlet';
 
 import shell from 'shelljs';
-
-import inquirer from 'inquirer';
 
 const glob = require( 'glob' );
 
