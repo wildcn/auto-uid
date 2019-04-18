@@ -28,7 +28,7 @@
 ### 设置提交勾子指令: feuid --setup 
     cd projectRoot && feuid --setup
     
-    # 这个指令自动添加2个npm模块 feuid、precommit
+    # 这个指令自动添加2个npm模块 feuid、pre-commit
     # 并在 package.json 的 scripts 添加 feuid 指令
     # 和在 package.json 添加 pre-commit: ["feuid"] 设置
     # 拷贝 feuid 模块里的 feuid.config.js 到项目根目录
