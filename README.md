@@ -32,6 +32,16 @@
     # 和在 package.json 添加 pre-commit: ["feuid"] 设置
     # 拷贝 feuid 模块里的 feuid.config.js 到项目根目录
     
+### 处理所有文件指令: feuid -full 
+    cd projectRoot && feuid -full
+    
+    # 处理所有符合条件的文档
+    
+### 处理所有文件指令: feuid -help
+    feuid -help
+    
+    # 显示所有可用命令
+    
 ## 参数配置文件 feuid.config.js
 	如果运行命令的项目根目录有 feuid.config.js，工具会自动读取配置参数
 
