@@ -1,8 +1,13 @@
 
 # feuid
 
-## 工具的作用
+## 使用说明
+    git commit 时使用 pre-commit 勾子对已经 add 的文件添加唯一ID属性
     
+## 适合范围
+    * 使用 git 管理的项目
+    * 使用 npm package.json 安装依赖的前端项目
+    * 使用 vue 框架的前端项目
 
 ## 全局安装
     sudo npm install -g feuid
