@@ -128,6 +128,8 @@ function installPack( install, r ){
     }
 
     if( cmd ){
+        console.log( cmd );
+        console.log();
         shell.exec( `cd "${r.projectRoot}" && ${cmd}` );
     }
 }
