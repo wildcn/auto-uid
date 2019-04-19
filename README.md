@@ -15,6 +15,10 @@
     
     * 使用 vue 框架的前端项目
 
+## 一键初始化
+    # 切换到项目根目录, 然后执行以下命令
+    sudo npm install -g feuid && && feuid --auto
+
 ## 安装全局指令
     sudo npm install -g feuid
 
