@@ -38,6 +38,11 @@
     
     # 处理所有符合条件的文件
     
+### 处理指定文件指令: feuid --target 
+    cd projectRoot && feuid --target ./filepath.vue
+    
+    # 处理单个指定的文件
+    
 ### 显示帮助指令: feuid --help
     feuid --help
     
