@@ -33,6 +33,7 @@ export default class ProjectReplaceVUE extends Project {
         this.fixRepeatRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([^'"]*)?\\2`, 'ig');
         this.firstSpaceRe = /^([\s]|>)/;
         this.lastSpaceRe = /[\s]$/;
+        this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
         if( this.info.feuid.ignoretag && this.info.feuid.ignoretag.length ){
             this.ignoreTagRe = new RegExp( `^<(${this.info.feuid.ignoretag.join('|')})\\b`, 'i');
@@ -80,6 +81,17 @@ export default class ProjectReplaceVUE extends Project {
         let info = this.info;
         let p = this;
 
+        let attrPlaceholder = '66FEUID';
+        let attrData = {};
+        let attrCount = 1;
+
+        content = content.replace( this.equalContentRe, function( $0, $1, $2, $3 ){
+            let key = `${attrPlaceholder}${attrCount}${attrPlaceholder}`;
+            attrData[ key ] = $3;
+            attrCount++;
+            return `${$1}${$2}${key}${$2}`;
+        });
+
         if( info.feuid.fixempty ){
             content = this.fixEmpty( content );
         }
@@ -109,6 +121,10 @@ export default class ProjectReplaceVUE extends Project {
             r = `${$1}${$2}${uid}${$3}`;
             return r;
         });
+
+        for( let key in attrData ){
+            content = content.replace( key, attrData[key] );
+        }
 
         return content;
     }

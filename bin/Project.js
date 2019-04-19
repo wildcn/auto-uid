@@ -86,10 +86,15 @@ var Project = function () {
         value: function getChangeFiles() {
             var p = this;
 
+            if (this.app.program.target) {
+                p.allFile.push(_path2.default.resolve(this.app.program.target));
+                return;
+            }
+
             if (this.app.program.full) {
                 var globRe = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.+(" + p.info.feuid.extension.join('|') + ")";
 
-                p.allFile = glob.sync(globRe, {});
+                p.allFile = p.allFile.concat(glob.sync(globRe, {}));
                 //console.log( 1 )
 
                 return;

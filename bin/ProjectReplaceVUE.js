@@ -66,6 +66,7 @@ var ProjectReplaceVUE = function (_Project) {
             this.fixRepeatRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([^'\"]*)?\\2", 'ig');
             this.firstSpaceRe = /^([\s]|>)/;
             this.lastSpaceRe = /[\s]$/;
+            this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
             if (this.info.feuid.ignoretag && this.info.feuid.ignoretag.length) {
                 this.ignoreTagRe = new RegExp("^<(" + this.info.feuid.ignoretag.join('|') + ")\\b", 'i');
@@ -112,6 +113,17 @@ var ProjectReplaceVUE = function (_Project) {
             var info = this.info;
             var p = this;
 
+            var attrPlaceholder = '66FEUID';
+            var attrData = {};
+            var attrCount = 1;
+
+            content = content.replace(this.equalContentRe, function ($0, $1, $2, $3) {
+                var key = "" + attrPlaceholder + attrCount + attrPlaceholder;
+                attrData[key] = $3;
+                attrCount++;
+                return "" + $1 + $2 + key + $2;
+            });
+
             if (info.feuid.fixempty) {
                 content = this.fixEmpty(content);
             }
@@ -141,6 +153,10 @@ var ProjectReplaceVUE = function (_Project) {
                 r = "" + $1 + $2 + uid + $3;
                 return r;
             });
+
+            for (var key in attrData) {
+                content = content.replace(key, attrData[key]);
+            }
 
             return content;
         }
