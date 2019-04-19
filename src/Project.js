@@ -50,19 +50,17 @@ export default class Project {
     getChangeFiles(){
         let p = this;
 
-        if( this.app.program.target ){
-            p.allFile.push( path.resolve( this.app.program.target ) );
-            return;
-        }
-
         if( this.app.program.full ){
             let globRe = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.+(${p.info.feuid.extension.join('|')})`;
 
             p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
-            //console.log( 1 )
-
             return;
         } 
+
+        if( this.app.program.target ){
+            p.allFile.push( path.resolve( this.app.program.target ) );
+            return;
+        }
 
         let gitStatus, lines;
         gitStatus = shell.exec( `cd '${this.info.currentRoot}' && git status`, { silent: true } );
