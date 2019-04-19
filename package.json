@@ -39,6 +39,7 @@
     "chalk": "^2.4.1",
     "clear": "^0.1.0",
     "commander": "^2.20.0",
+    "compare-versions": "^3.4.0",
     "deepmerge": "^3.2.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^7.0.1",

@@ -94,6 +94,7 @@ var Project = function () {
             }
 
             if (this.app.program.target) {
+                console.log(this.app.program.target);
                 p.allFile.push(_path2.default.resolve(this.app.program.target));
                 return;
             }

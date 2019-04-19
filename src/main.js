@@ -17,6 +17,7 @@ let PROJECT_ROOT = process.env.PWD;
 
 const packJSON = require( `${APP_ROOT}/package.json` );
 const config = require( `${APP_ROOT}/config.json` );
+const compareVersions = require('compare-versions');
 
 var program = require('commander');
 
@@ -44,14 +45,59 @@ setupConfig( projectInfo );
 
 PROJECT_ROOT = projectInfo.projectRoot;
 
+resolveMain( projectInfo );
+
 require('babel-core/register');
 require("babel-polyfill");
 const init = require( './app' ).init;
 
 if( program.auto ){
-    init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+    if( projectInfo.hasProjectMain && projectInfo.projectMainCmd ){
+        shell.exec( projectInfo.projectMainCmd + '--full' );
+    }else{
+        init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+    }
 }else if( !program.setup ){
-    init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+    if( projectInfo.hasProjectMain && projectInfo.projectMainCmd ){
+        if( program.full ){
+            shell.exec( projectInfo.projectMainCmd + '--full' );
+        }else if( program.target ){
+            shell.exec( projectInfo.projectMainCmd + '--target' );
+        }else{
+            shell.exec( projectInfo.projectMainCmd );
+        }
+    }else{
+        init( APP_ROOT, PROJECT_ROOT, packJSON, config, program, projectInfo );
+    }
+}
+
+function resolveMain( r ){
+    r.appMain = path.join( r.appRoot, 'bin/main.js' );
+    r.projectMain = path.join( r.projectRoot, 'node_modules/feuid/bin/main.js' );
+    r.projectPack = path.join( r.projectRoot, 'node_modules/feuid/package.json' );
+    r.hasProjectMain = false;
+
+    if( fs.existsSync( r.projectPack ) ){
+        let pPack = require( r.projectPack );
+        if( packJSON.version && pPack.version ){
+            if( compareVersions( packJSON.version, pPack.version ) > -1 ){
+                return;
+            }
+        }
+    }
+
+    if( !shell.which( 'node' ) ){
+        return;
+    }
+
+    if( r.appMain == r.projectMain ){
+        return;
+    }
+
+    if( fs.existsSync( r.projectMain ) ){
+        r.hasProjectMain = 1;
+        r.projectMainCmd = `node "${r.projectMain}" `;
+    }
 }
 
 function setupConfig( r ){

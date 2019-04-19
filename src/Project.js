@@ -58,6 +58,7 @@ export default class Project {
         } 
 
         if( this.app.program.target ){
+            console.log( this.app.program.target );
             p.allFile.push( path.resolve( this.app.program.target ) );
             return;
         }
