@@ -20,6 +20,9 @@
     
 ## 执行效果
 
+### 执行流程
+![feuid-commit-flow.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/feuid-commit-flow.png)
+
 ### 执行前
 ![pre-execute.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/pre-execute.png)
 
