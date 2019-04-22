@@ -21,16 +21,16 @@
 ## 执行效果
 
 ### 执行流程
-![feuid-commit-flow.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/feuid-commit-flow.png)
+![feuid-commit-flow.png](http://p5.qhimg.com/d/inn/1845dd27/images/feuid-commit-flow.png)
 
 ### 执行前
-![pre-execute.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/pre-execute.png)
+![pre-execute.png](http://p5.qhimg.com/d/inn/1845dd27/images/pre-execute.png)
 
 ### 执行后
-![after-execute.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/after-execute.png)
+![after-execute.png](http://p5.qhimg.com/d/inn/1845dd27/images/after-execute.png)
 
 ### package.json
-![package.json.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/package.json.png)
+![package.json.png](http://p5.qhimg.com/d/inn/1845dd27/images/package.json.png)
 
 ## 安装全局指令
     sudo npm install -g feuid
