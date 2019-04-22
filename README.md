@@ -17,6 +17,17 @@
 
 ## 一键初始化 (切换到项目根目录, 然后执行以下命令)(执行完这条命令之后以后每次commit的时候会自动生成唯一ID)
     sudo npm install -g feuid && feuid --auto
+    
+## 执行效果
+
+### 执行前
+![pre-execute.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/pre-execute.png)
+
+### 执行后
+![after-execute.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/after-execute.png)
+
+### package.json
+![package.json.png](https://raw.githubusercontent.com/hnjd-fe/feuid/master/docs/images/package.json.png)
 
 ## 安装全局指令
     sudo npm install -g feuid
