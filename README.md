@@ -60,6 +60,11 @@
     
     # 处理单个指定的文件
     
+### 更新已经生成的唯一ID: feuid --update
+    feuid --full --update
+    
+    # 通常与 --full 或者 --target 结合使用
+    
 ### 显示帮助指令: feuid --help
     feuid --help
     
