@@ -33,7 +33,7 @@ export default class ProjectReplaceVUE extends Project {
 
         this.attrnameRe = new RegExp( `${this.info.feuid.attrname}[\\s]*?\\=`, 'i');
         this.fixEmptyRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`, 'ig');
-        this.fixRepeatRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([^'"]*)?\\2`, 'ig');
+        this.fixRepeatRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`, 'ig');
         this.firstSpaceRe = /^([\s]|>)/;
         this.lastSpaceRe = /[\s]$/;
         this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
@@ -87,6 +87,12 @@ export default class ProjectReplaceVUE extends Project {
         let attrPlaceholder = '66FEUID';
         let attrData = {};
         let attrCount = 1;
+
+        if( p.app.program.update ){
+            content = content.replace( this.fixRepeatRe, function( $0, $1, $2, $3 ){
+                return `${$1}${$2}${info.feuid.idprefix}${p.getUuid()}${$2}`;
+            });
+        }
 
         content = content.replace( this.equalContentRe, function( $0, $1, $2, $3 ){
             let key = `${attrPlaceholder}${attrCount}${attrPlaceholder}`;

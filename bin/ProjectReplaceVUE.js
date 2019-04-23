@@ -66,7 +66,7 @@ var ProjectReplaceVUE = function (_Project) {
 
             this.attrnameRe = new RegExp(this.info.feuid.attrname + "[\\s]*?\\=", 'i');
             this.fixEmptyRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", 'ig');
-            this.fixRepeatRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([^'\"]*)?\\2", 'ig');
+            this.fixRepeatRe = new RegExp("(" + this.info.feuid.attrname + "[\\s]*?\\=)('|\")([a-z0-9\\-\\_]*)?\\2", 'ig');
             this.firstSpaceRe = /^([\s]|>)/;
             this.lastSpaceRe = /[\s]$/;
             this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
@@ -119,6 +119,12 @@ var ProjectReplaceVUE = function (_Project) {
             var attrPlaceholder = '66FEUID';
             var attrData = {};
             var attrCount = 1;
+
+            if (p.app.program.update) {
+                content = content.replace(this.fixRepeatRe, function ($0, $1, $2, $3) {
+                    return "" + $1 + $2 + info.feuid.idprefix + p.getUuid() + $2;
+                });
+            }
 
             content = content.replace(this.equalContentRe, function ($0, $1, $2, $3) {
                 var key = "" + attrPlaceholder + attrCount + attrPlaceholder;
