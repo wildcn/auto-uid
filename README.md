@@ -21,16 +21,16 @@
 ## 执行效果
 
 ### 执行流程
-![feuid-commit-flow.png](http://p9.qhimg.com/d/inn/b80f655e/feuid-commit-flow.png)
+![feuid-commit-flow.png](http://p6.qhimg.com/d/inn/06dfd366/images/feuid-commit-flow.png)
 
 ### 执行前
-![pre-execute.png](http://p5.qhimg.com/d/inn/1845dd27/images/pre-execute.png)
+![pre-execute.png](http://p8.qhimg.com/d/inn/06dfd366/images/pre-execute.png)
 
 ### 执行后
-![after-execute.png](http://p2.qhimg.com/d/inn/4b0f2131/after-execute.png)
+![after-execute.png](http://p5.qhimg.com/d/inn/06dfd366/images/after-execute.png)
 
 ### package.json
-![package.json.png](http://p5.qhimg.com/d/inn/1845dd27/images/package.json.png)
+![package.json.png](http://p0.qhimg.com/d/inn/06dfd366/images/package.json.png)
 
 ## 安装全局指令
     sudo npm install -g feuid
@@ -59,6 +59,11 @@
     cd projectRoot && feuid --target ./filepath.vue
     
     # 处理单个指定的文件
+    
+### 更新已经生成的唯一ID: feuid --update
+    feuid --full --update
+    
+    # 通常与 --full 或者 --target 结合使用
     
 ### 显示帮助指令: feuid --help
     feuid --help
