@@ -55,6 +55,9 @@ var ProjectReplaceVUE = function (_Project) {
     _createClass(ProjectReplaceVUE, [{
         key: "init",
         value: function init() {
+            this.gcount = 1;
+            this.idmap = {};
+
             //console.log( this.info );
             this.delimiter = '|||||';
             this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
@@ -284,7 +287,13 @@ var ProjectReplaceVUE = function (_Project) {
     }, {
         key: "getUuid",
         value: function getUuid() {
-            return Uuid().replace(/\-/g, '');
+            var r = (Date.now() + parseInt(Math.random() * Math.pow(10, 12)) + this.gcount++).toString(16);
+            //let r =  Uuid().replace( /\-/g, '' );
+            if (r in this.idmap) {
+                r = this.getUuid();
+            }
+            this.idmap[r] = this.gcount;
+            return r;
         }
     }]);
 

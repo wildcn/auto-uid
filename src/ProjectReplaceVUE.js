@@ -22,6 +22,9 @@ export default class ProjectReplaceVUE extends Project {
     }
 
     init() {
+        this.gcount = 1;
+        this.idmap = {};
+
         //console.log( this.info );
         this.delimiter = '|||||';
         this.pattern = '{delimiter}{count}{delimiter}{content}{delimiter}';
@@ -246,7 +249,13 @@ export default class ProjectReplaceVUE extends Project {
     }
 
     getUuid(){
-        return Uuid().replace( /\-/g, '' );
+        let r = ( Date.now() + parseInt( Math.random() *  Math.pow( 10, 12 ) ) + this.gcount++ ).toString( 16 );
+        //let r =  Uuid().replace( /\-/g, '' );
+        if( r in this.idmap ){
+            r = this.getUuid();
+        }
+        this.idmap[ r ] = this.gcount;
+        return r;
     }
 
 }
