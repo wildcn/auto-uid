@@ -27,7 +27,7 @@
 ![pre-execute.png](http://p8.qhimg.com/d/inn/06dfd366/images/pre-execute.png)
 
 ### 执行后
-![after-execute.png](http://p5.qhimg.com/d/inn/06dfd366/images/after-execute.png)
+![after-execute.png](http://p9.qhimg.com/d/inn/4dd249a9/after-execute.png)
 
 ### package.json
 ![package.json.png](http://p0.qhimg.com/d/inn/06dfd366/images/package.json.png)
