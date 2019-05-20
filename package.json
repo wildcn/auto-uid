@@ -1,6 +1,6 @@
 {
   "name": "feuid",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "frontend unique id",
   "main": "src/main.js",
   "bin": {
