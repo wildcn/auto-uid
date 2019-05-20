@@ -87,9 +87,12 @@ var Project = function () {
             var p = this;
 
             if (this.app.program.full) {
-                var globRe = p.info.projectRoot + "/+(" + p.info.feuid.dir.join('|') + ")/**/*.+(" + p.info.feuid.extension.join('|') + ")";
 
-                p.allFile = p.allFile.concat(glob.sync(globRe, {}));
+                p.info.feuid.dir.map(function (item) {
+                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.feuid.extension.join('|') + ")";
+                    p.allFile = p.allFile.concat(glob.sync(globRe, {}));
+                });
+
                 return;
             }
 

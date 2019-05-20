@@ -51,9 +51,12 @@ export default class Project {
         let p = this;
 
         if( this.app.program.full ){
-            let globRe = `${p.info.projectRoot}/+(${p.info.feuid.dir.join('|')})/**/*.+(${p.info.feuid.extension.join('|')})`;
 
-            p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
+            p.info.feuid.dir.map( ( item ) => {
+                let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid.extension.join('|')})`;
+                p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
+            });
+            
             return;
         } 
 
