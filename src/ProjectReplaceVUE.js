@@ -126,6 +126,9 @@ export default class ProjectReplaceVUE extends Project {
 
             return r;
         });
+        //repeat list add count
+        let countattrname = info.feuid.countattrname || 'data-feuidcount';
+        let countReName = new RegExp( `(\\:${countattrname}.*?\\=)('|")(.*?)\\2` );
 
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
             let uid = '';
@@ -135,29 +138,33 @@ export default class ProjectReplaceVUE extends Project {
             if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
                 return r;
             }
-
+            if(
+                /\bv\-for\b/i.test( r )
+                && new RegExp( `${info.feuid.attrname}\\b`, 'i').test( r )
+                && new RegExp( `${countattrname}\\b`, 'i').test( r )
+                && !/\:key\b/i.test( r )
+            ){
+                r = r.replace( countReName, `` );
+                return r;
+            }
 
             if(
                 /\bv\-for\b/i.test( r )
                 && /\:key\b/i.test( r )
-                && /data\-testid\b/i.test( r  )
+                && new RegExp( `${info.feuid.attrname}\\b`, 'i').test( r )
              ){
-                console.log( 'find v-for', r )
                 let curKey = '';
 
                 r.replace( /.*?\:key.*?\=('|")(.*?)\1/, function( $0, $1, $2 ){
                     curKey = $2;
                 });
 
-                if( !/data\-testidx\b/i.test( r  ) ){
-                    console.log( 1  )
-                    uid = uid + ` :data-testidx="${curKey}"`
+                if( !new RegExp( `:${countattrname}\\b`, 'i' ).test( r  ) ){
+                    uid = uid + ` :${countattrname}="${curKey}"`
                     r = `${$1}${$2}${uid}${$3}`;
                 }else{
-                    r = r.replace( /(\:data\-testidx.*?\=)('|")(.*?)\2/, `$1$2${curKey}$2` );
-                    console.log( 2, r  )
+                    r = r.replace( countReName, `$1$2${curKey}$2` );
                 }
-
             }
 
             return r;

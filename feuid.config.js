@@ -6,6 +6,7 @@ let result = {
     , "dir": [ 'src' ]
     , "encoding": "utf8"
     , "attrname": "data-testid"
+    , "countattrname": "data-feuidcount"
     , "fixempty": true
     , "fixrepeat": true
     , "idprefix": "fe"
