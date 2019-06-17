@@ -63,7 +63,7 @@ export default class ProjectReplaceVUE extends Project {
             this.tagInfo.data.map( item => {
                 //console.log( item );
                 let content = this.addDataId( item.innerTag.tagContent );
-                
+
                 this.tagInfo.newContent =  [
                     this.tagInfo.newContent.slice( 0, item.innerTag.start )
                     , content
@@ -109,7 +109,7 @@ export default class ProjectReplaceVUE extends Project {
         }
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
             let uid = '';
-            //if( !/data-testid\=/i.test( $2 ) ){
+
             let r = `${$1}${$2}${uid}${$3}`;
 
             if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
@@ -121,18 +121,50 @@ export default class ProjectReplaceVUE extends Project {
                 if( !p.lastSpaceRe.test( $2 ) ){
                     uid = ' ' + uid;
                 }
-                /*
-                if( !p.firstSpaceRe.test( $2 ) ){
-                    uid += ' ';
-                }
-                */
             }
             r = `${$1}${$2}${uid}${$3}`;
+
+            return r;
+        });
+
+        content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
+            let uid = '';
+
+            let r = `${$1}${$2}${uid}${$3}`;
+
+            if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
+                return r;
+            }
+
+
+            if(
+                /\bv\-for\b/i.test( r )
+                && /\:key\b/i.test( r )
+                && /data\-testid\b/i.test( r  )
+             ){
+                console.log( 'find v-for', r )
+                let curKey = '';
+
+                r.replace( /.*?\:key.*?\=('|")(.*?)\1/, function( $0, $1, $2 ){
+                    curKey = $2;
+                });
+
+                if( !/data\-testidx\b/i.test( r  ) ){
+                    console.log( 1  )
+                    uid = uid + ` :data-testidx="${curKey}"`
+                    r = `${$1}${$2}${uid}${$3}`;
+                }else{
+                    r = r.replace( /(\:data\-testidx.*?\=)('|")(.*?)\2/, `$1$2${curKey}$2` );
+                    console.log( 2, r  )
+                }
+
+            }
+
             return r;
         });
 
         for( let key in attrData ){
-            content = content.replace( key, attrData[key] );
+            content = content.replace( new RegExp( key, 'g' ), attrData[key] );
         }
 
         return content;
@@ -154,7 +186,7 @@ export default class ProjectReplaceVUE extends Project {
 
         for( let key in repeatObj ){
             let fixRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")(${key})?\\2`, 'ig');
-            count = 0; 
+            count = 0;
             content = content.replace( fixRe, function($0, $1, $2, $3){
                 if( count ){
                     $3 = this.info.feuid.idprefix + p.getUuid();
@@ -180,11 +212,11 @@ export default class ProjectReplaceVUE extends Project {
 
     getTag( tag, filepath, matchAll = false ){
         let curIndex = 0;
-        let result = { 
+        let result = {
             content: this.curContent
             , newContent: this.curContent
             , data: []
-            , filepath: filepath 
+            , filepath: filepath
         };
 
         let startReg = new RegExp( `<${tag}[^<\\/]*?>`, 'i' );
@@ -241,7 +273,7 @@ export default class ProjectReplaceVUE extends Project {
         let tmpEnd = endContent.match( endReg  );
 
         if( tmpEnd ){
-            let endMatch = this.curContent.slice( nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length ) 
+            let endMatch = this.curContent.slice( nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length )
             let tmpMatch = endMatch.match( startReg );
             if( tmpMatch ){
                 r = this.matchEnd( nextIndex + tmpEnd.index + tagLength, startReg, endReg, tmpEnd[0].length );

@@ -141,7 +141,7 @@ var ProjectReplaceVUE = function (_Project) {
             }
             content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
                 var uid = '';
-                //if( !/data-testid\=/i.test( $2 ) ){
+
                 var r = "" + $1 + $2 + uid + $3;
 
                 if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
@@ -153,18 +153,44 @@ var ProjectReplaceVUE = function (_Project) {
                     if (!p.lastSpaceRe.test($2)) {
                         uid = ' ' + uid;
                     }
-                    /*
-                    if( !p.firstSpaceRe.test( $2 ) ){
-                        uid += ' ';
-                    }
-                    */
                 }
                 r = "" + $1 + $2 + uid + $3;
+
+                return r;
+            });
+
+            content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
+                var uid = '';
+
+                var r = "" + $1 + $2 + uid + $3;
+
+                if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
+                    return r;
+                }
+
+                if (/\bv\-for\b/i.test(r) && /\:key\b/i.test(r) && /data\-testid\b/i.test(r)) {
+                    console.log('find v-for', r);
+                    var curKey = '';
+
+                    r.replace(/.*?\:key.*?\=('|")(.*?)\1/, function ($0, $1, $2) {
+                        curKey = $2;
+                    });
+
+                    if (!/data\-testidx\b/i.test(r)) {
+                        console.log(1);
+                        uid = uid + (" :data-testidx=\"" + curKey + "\"");
+                        r = "" + $1 + $2 + uid + $3;
+                    } else {
+                        r = r.replace(/(\:data\-testidx.*?\=)('|")(.*?)\2/, "$1$2" + curKey + "$2");
+                        console.log(2, r);
+                    }
+                }
+
                 return r;
             });
 
             for (var key in attrData) {
-                content = content.replace(key, attrData[key]);
+                content = content.replace(new RegExp(key, 'g'), attrData[key]);
             }
 
             return content;
