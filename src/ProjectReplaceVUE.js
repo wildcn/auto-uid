@@ -128,7 +128,9 @@ export default class ProjectReplaceVUE extends Project {
         });
         //repeat list add count
         let countattrname = info.feuid.countattrname || 'data-feuidcount';
-        let countReName = new RegExp( `(\\:${countattrname}.*?\\=)('|")(.*?)\\2` );
+        let countReName = new RegExp( `(\\:${countattrname}.*?\\=)('|")(.*?)\\2`, 'ig' );
+        let attrnameExists =  new RegExp( `${info.feuid.attrname}\\b`, 'i');
+        let countattrnameExists= new RegExp(`\\:${countattrname}\\b`, 'i');
 
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
             let uid = '';
@@ -140,8 +142,8 @@ export default class ProjectReplaceVUE extends Project {
             }
             if(
                 /\bv\-for\b/i.test( r )
-                && new RegExp( `${info.feuid.attrname}\\b`, 'i').test( r )
-                && new RegExp( `${countattrname}\\b`, 'i').test( r )
+                && new RegExp( attrnameExists, 'i').test( r )
+                && new RegExp( countattrnameExists, 'i').test( r )
                 && !/\:key\b/i.test( r )
             ){
                 r = r.replace( countReName, `` );
@@ -151,7 +153,7 @@ export default class ProjectReplaceVUE extends Project {
             if(
                 /\bv\-for\b/i.test( r )
                 && /\:key\b/i.test( r )
-                && new RegExp( `${info.feuid.attrname}\\b`, 'i').test( r )
+                && new RegExp( attrnameExists, 'i').test( r )
              ){
                 let curKey = '';
 
@@ -159,7 +161,7 @@ export default class ProjectReplaceVUE extends Project {
                     curKey = $2;
                 });
 
-                if( !new RegExp( `:${countattrname}\\b`, 'i' ).test( r  ) ){
+                if( !countattrnameExists.test( r  ) ){
                     uid = uid + ` :${countattrname}="${curKey}"`
                     r = `${$1}${$2}${uid}${$3}`;
                 }else{
