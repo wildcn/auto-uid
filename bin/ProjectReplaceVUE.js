@@ -141,7 +141,7 @@ var ProjectReplaceVUE = function (_Project) {
             }
             content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
                 var uid = '';
-                //if( !/data-testid\=/i.test( $2 ) ){
+
                 var r = "" + $1 + $2 + uid + $3;
 
                 if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
@@ -153,18 +153,48 @@ var ProjectReplaceVUE = function (_Project) {
                     if (!p.lastSpaceRe.test($2)) {
                         uid = ' ' + uid;
                     }
-                    /*
-                    if( !p.firstSpaceRe.test( $2 ) ){
-                        uid += ' ';
-                    }
-                    */
                 }
                 r = "" + $1 + $2 + uid + $3;
+
+                return r;
+            });
+            //repeat list add count
+            var countattrname = info.feuid.countattrname || 'data-feuidcount';
+            var countReName = new RegExp("(\\:" + countattrname + ".*?\\=)('|\")(.*?)\\2");
+
+            content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
+                var uid = '';
+
+                var r = "" + $1 + $2 + uid + $3;
+
+                if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
+                    return r;
+                }
+                if (/\bv\-for\b/i.test(r) && new RegExp(info.feuid.attrname + "\\b", 'i').test(r) && new RegExp(countattrname + "\\b", 'i').test(r) && !/\:key\b/i.test(r)) {
+                    r = r.replace(countReName, "");
+                    return r;
+                }
+
+                if (/\bv\-for\b/i.test(r) && /\:key\b/i.test(r) && new RegExp(info.feuid.attrname + "\\b", 'i').test(r)) {
+                    var curKey = '';
+
+                    r.replace(/.*?\:key.*?\=('|")(.*?)\1/, function ($0, $1, $2) {
+                        curKey = $2;
+                    });
+
+                    if (!new RegExp(":" + countattrname + "\\b", 'i').test(r)) {
+                        uid = uid + (" :" + countattrname + "=\"" + curKey + "\"");
+                        r = "" + $1 + $2 + uid + $3;
+                    } else {
+                        r = r.replace(countReName, "$1$2" + curKey + "$2");
+                    }
+                }
+
                 return r;
             });
 
             for (var key in attrData) {
-                content = content.replace(key, attrData[key]);
+                content = content.replace(new RegExp(key, 'g'), attrData[key]);
             }
 
             return content;
