@@ -81,7 +81,7 @@
 	    , "dir": [ 'src' ]                  //需要处理唯一ID的目录，默认为 src
 	    , "encoding": "utf8"                //项目中的文件编码
 	    , "attrname": "data-testid"         //唯一ID的属性名
-	    , "countattrname": "data-feuidcount"//列表循环的标签个数计数属性名
+	    , "countattrname": "data-feuidindex"//列表循环的标签计数索引值
 	    , "idprefix": "fe"                  //唯一ID属性值的前缀名
 	    , "fixempty": true                  //如果唯一ID属性为空自动修复
 	    , "fixrepeat": true                 //如果唯一ID重复自动去重

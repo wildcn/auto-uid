@@ -6,11 +6,12 @@ let result = {
     , "dir": [ 'src' ]
     , "encoding": "utf8"
     , "attrname": "data-testid"
-    , "countattrname": "data-feuidcount"
+    , "countattrname": "data-feuidindex"
     , "fixempty": true
     , "fixrepeat": true
     , "idprefix": "fe"
-    , "ignoretag": [ "v-hover", "template", "el-table-column" ]
+    //, "ignoretag": [ "v-hover", "template", "el-table-column" ]
+    , "ignoretag": [ "v-hover", "el-table-column" ]
 };
 
 module.exports = result;

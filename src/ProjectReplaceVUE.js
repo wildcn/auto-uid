@@ -5,6 +5,8 @@ import path from "path";
 import chalk from 'chalk';
 import clear from 'clear';
 
+require( './utils/polyfile.js' );
+
 const shell = require( 'shelljs' );
 const glob = require("glob");
 const Uuid = require( 'uuid/v4' );
@@ -39,6 +41,7 @@ export default class ProjectReplaceVUE extends Project {
         this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
         if( this.info.feuid.ignoretag && this.info.feuid.ignoretag.length ){
+            //this.info.feuid.ignoretag.remove( 'template' );
             this.ignoreTagRe = new RegExp( `^<(${this.info.feuid.ignoretag.join('|')})\\b`, 'i');
         }
 
@@ -61,7 +64,6 @@ export default class ProjectReplaceVUE extends Project {
             this.tagInfo = this.getTag( 'template', filepath, 0 );
 
             this.tagInfo.data.map( item => {
-                //console.log( item );
                 let content = this.addDataId( item.innerTag.tagContent );
 
                 this.tagInfo.newContent =  [
@@ -113,6 +115,8 @@ export default class ProjectReplaceVUE extends Project {
             let r = `${$1}${$2}${uid}${$3}`;
 
             if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
+                console.log( info.feuid.ignoretag )
+                console.log( 'ignoreTagRe', $1 )
                 return r;
             }
 
@@ -127,10 +131,11 @@ export default class ProjectReplaceVUE extends Project {
             return r;
         });
         //repeat list add count
-        let countattrname = info.feuid.countattrname || 'data-feuidcount';
+        let countattrname = info.feuid.countattrname || 'data-feuidindex';
         let countReName = new RegExp( `(\\:${countattrname}.*?\\=)('|")(.*?)\\2`, 'ig' );
         let attrnameExists =  new RegExp( `${info.feuid.attrname}\\b`, 'i');
         let countattrnameExists= new RegExp(`\\:${countattrname}\\b`, 'i');
+        let vkeyRe = /\:key\b/i;
 
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
             let uid = '';
@@ -141,19 +146,19 @@ export default class ProjectReplaceVUE extends Project {
                 return r;
             }
             if(
-                /\bv\-for\b/i.test( r )
-                && new RegExp( attrnameExists, 'i').test( r )
+                new RegExp( attrnameExists, 'i').test( r )
                 && new RegExp( countattrnameExists, 'i').test( r )
-                && !/\:key\b/i.test( r )
+                && !vkeyRe.test( r )
+                //&& /\bv\-for\b/i.test( r )
             ){
                 r = r.replace( countReName, `` );
                 return r;
             }
 
             if(
-                /\bv\-for\b/i.test( r )
-                && /\:key\b/i.test( r )
+                vkeyRe.test( r )
                 && new RegExp( attrnameExists, 'i').test( r )
+                //&& /\bv\-for\b/i.test( r )
              ){
                 let curKey = '';
 

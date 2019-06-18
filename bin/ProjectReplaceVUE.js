@@ -34,6 +34,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+require('./utils/polyfile.js');
+
 var shell = require('shelljs');
 var glob = require("glob");
 var Uuid = require('uuid/v4');
@@ -72,6 +74,7 @@ var ProjectReplaceVUE = function (_Project) {
             this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
             if (this.info.feuid.ignoretag && this.info.feuid.ignoretag.length) {
+                //this.info.feuid.ignoretag.remove( 'template' );
                 this.ignoreTagRe = new RegExp("^<(" + this.info.feuid.ignoretag.join('|') + ")\\b", 'i');
             }
 
@@ -97,7 +100,6 @@ var ProjectReplaceVUE = function (_Project) {
                 _this2.tagInfo = _this2.getTag('template', filepath, 0);
 
                 _this2.tagInfo.data.map(function (item) {
-                    //console.log( item );
                     var content = _this2.addDataId(item.innerTag.tagContent);
 
                     _this2.tagInfo.newContent = [_this2.tagInfo.newContent.slice(0, item.innerTag.start), content, _this2.tagInfo.newContent.slice(item.innerTag.end)].join('');
@@ -145,6 +147,8 @@ var ProjectReplaceVUE = function (_Project) {
                 var r = "" + $1 + $2 + uid + $3;
 
                 if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
+                    console.log(info.feuid.ignoretag);
+                    console.log('ignoreTagRe', $1);
                     return r;
                 }
 
@@ -159,10 +163,11 @@ var ProjectReplaceVUE = function (_Project) {
                 return r;
             });
             //repeat list add count
-            var countattrname = info.feuid.countattrname || 'data-feuidcount';
+            var countattrname = info.feuid.countattrname || 'data-feuidindex';
             var countReName = new RegExp("(\\:" + countattrname + ".*?\\=)('|\")(.*?)\\2", 'ig');
             var attrnameExists = new RegExp(info.feuid.attrname + "\\b", 'i');
             var countattrnameExists = new RegExp("\\:" + countattrname + "\\b", 'i');
+            var vkeyRe = /\:key\b/i;
 
             content = content.replace(p.tagContentRe, function ($0, $1, $2, $3) {
                 var uid = '';
@@ -172,25 +177,29 @@ var ProjectReplaceVUE = function (_Project) {
                 if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
                     return r;
                 }
-                if (/\bv\-for\b/i.test(r) && new RegExp(attrnameExists, 'i').test(r) && new RegExp(countattrnameExists, 'i').test(r) && !/\:key\b/i.test(r)) {
-                    r = r.replace(countReName, "");
-                    return r;
-                }
-
-                if (/\bv\-for\b/i.test(r) && /\:key\b/i.test(r) && new RegExp(attrnameExists, 'i').test(r)) {
-                    var curKey = '';
-
-                    r.replace(/.*?\:key.*?\=('|")(.*?)\1/, function ($0, $1, $2) {
-                        curKey = $2;
-                    });
-
-                    if (!countattrnameExists.test(r)) {
-                        uid = uid + (" :" + countattrname + "=\"" + curKey + "\"");
-                        r = "" + $1 + $2 + uid + $3;
-                    } else {
-                        r = r.replace(countReName, "$1$2" + curKey + "$2");
+                if (new RegExp(attrnameExists, 'i').test(r) && new RegExp(countattrnameExists, 'i').test(r) && !vkeyRe.test(r)
+                //&& /\bv\-for\b/i.test( r )
+                ) {
+                        r = r.replace(countReName, "");
+                        return r;
                     }
-                }
+
+                if (vkeyRe.test(r) && new RegExp(attrnameExists, 'i').test(r)
+                //&& /\bv\-for\b/i.test( r )
+                ) {
+                        var curKey = '';
+
+                        r.replace(/.*?\:key.*?\=('|")(.*?)\1/, function ($0, $1, $2) {
+                            curKey = $2;
+                        });
+
+                        if (!countattrnameExists.test(r)) {
+                            uid = uid + (" :" + countattrname + "=\"" + curKey + "\"");
+                            r = "" + $1 + $2 + uid + $3;
+                        } else {
+                            r = r.replace(countReName, "$1$2" + curKey + "$2");
+                        }
+                    }
 
                 return r;
             });
