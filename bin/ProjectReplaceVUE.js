@@ -147,8 +147,6 @@ var ProjectReplaceVUE = function (_Project) {
                 var r = "" + $1 + $2 + uid + $3;
 
                 if (p.ignoreTagRe && p.ignoreTagRe.test($1)) {
-                    console.log(info.feuid.ignoretag);
-                    console.log('ignoreTagRe', $1);
                     return r;
                 }
 

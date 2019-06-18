@@ -115,8 +115,6 @@ export default class ProjectReplaceVUE extends Project {
             let r = `${$1}${$2}${uid}${$3}`;
 
             if( p.ignoreTagRe && p.ignoreTagRe.test( $1 ) ){
-                console.log( info.feuid.ignoretag )
-                console.log( 'ignoreTagRe', $1 )
                 return r;
             }
 
