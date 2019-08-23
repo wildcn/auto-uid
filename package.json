@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "babel -w src/ -d bin/",
-    "public": "babel src/ -d bin/"
+    "serve": "babel -w src/ -d bin/",
+    "build": "babel src/ -d bin/"
   },
   "repository": {
     "type": "git",

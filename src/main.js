@@ -13,7 +13,7 @@ const shell = require( 'shelljs' );
 const merge = require('deepmerge')
 
 const APP_ROOT = path.resolve(__dirname, '..');
-let PROJECT_ROOT = process.env.PWD;
+let PROJECT_ROOT = process.env.PWD || process.cwd();
 
 const packJSON = require( `${APP_ROOT}/package.json` );
 const config = require( `${APP_ROOT}/config.json` );
