@@ -81,7 +81,7 @@ var App = function () {
                 return;
             }
 
-            if (!_fsExtra2.default.existsSync(this.projectRoot + "/.git")) {
+            if (!_fsExtra2.default.existsSync(this.projectInfo.gitRoot + "/.git")) {
                 console.error(error('feuid - dir is not git'));
                 return;
             }

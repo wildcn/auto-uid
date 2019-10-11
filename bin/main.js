@@ -21,6 +21,8 @@ var merge = require('deepmerge');
 var APP_ROOT = path.resolve(__dirname, '..');
 var PROJECT_ROOT = process.env.PWD || process.cwd();
 
+var GIT_DIR = PROJECT_ROOT;
+
 var packJSON = require(APP_ROOT + '/package.json');
 var config = require(APP_ROOT + '/config.json');
 var compareVersions = require('compare-versions');
@@ -43,6 +45,7 @@ setupPackage(projectInfo);
 setupConfig(projectInfo);
 
 PROJECT_ROOT = projectInfo.projectRoot;
+GIT_DIR = projectInfo.gitRoot;
 
 resolveMain(projectInfo);
 
@@ -203,6 +206,21 @@ function resolveProjectInfo(proot) {
         if (fs.existsSync(tmpFile)) {
             r.package = tmpFile;
             r.projectRoot = tmpPath;
+            break;
+        } else {
+            if (tmpPath.length === 1) {
+                break;
+            }
+            tmpPath = path.join(tmpPath, '../');
+        }
+    }
+
+    tmpPath = proot;
+    while (true) {
+        var _tmpFile = path.join(tmpPath, '.git');
+
+        if (fs.existsSync(_tmpFile)) {
+            r.gitRoot = tmpPath;
             break;
         } else {
             if (tmpPath.length === 1) {
