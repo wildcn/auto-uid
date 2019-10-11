@@ -44,7 +44,7 @@ export default class App {
             return;
         }
 
-        if( (!fs.existsSync( `${this.projectRoot}/.git` ) ) ){
+        if( (!fs.existsSync( `${this.projectInfo.gitRoot}/.git` ) ) ){
             console.error( error( 'feuid - dir is not git' ) );
             return;
         }
