@@ -26,7 +26,7 @@ var program = require('commander');
 program
     .version( packJSON.version )
     .option('-a, --auto', '使用 -s 初始化项目配置，并执行 -f 全量匹配并添加唯一ID' )
-    .option('-s, --setup', '初始化项目配置，在根目录下生成feuid2.js、package.json添加pre-commit勾子' )
+    .option('-s, --setup', '初始化项目配置，在根目录下生成feuid2.config.js、.huskyrc.json' )
     .option('-f, --full', '处理所有匹配的文件' )
     .option('-t, --target <target>', '处理指定文件' )
     .option('-u, --update', '更新已经生成的唯一ID' )
@@ -45,6 +45,7 @@ let projectInfo = resolveProjectInfo( PROJECT_ROOT );
 resolveConfig( projectInfo )
 setupPackage( projectInfo );
 setupConfig( projectInfo );
+setupHusky( projectInfo );
 
 PROJECT_ROOT = projectInfo.projectRoot;
 GIT_DIR = projectInfo.gitRoot;
@@ -121,6 +122,24 @@ function setupConfig( r ){
     }
 }
 
+function setupHusky( r ){
+    if( !program.setup ) return;
+    let projectConfig = `${r.projectRoot}/.huskyrc.json`;
+    let modConfig = `${r.projectRoot}/node_modules/feuid2/.huskyrc.json`;
+    let appConfig = `${r.appRoot}/.huskyrc.json`;
+
+    if( !fs.existsSync( projectConfig ) ){
+        let target = fs.existsSync( modConfig ) ? modConfig : '';
+        if( !target ){
+            target = fs.existsSync( appConfig ) ? appConfig : '';
+        }
+        if( target ){
+            fs.copyFileSync( target, projectConfig );
+        }
+    }
+}
+
+
 function setupPackage( r ){
     if( !program.setup ) return;
 
@@ -132,11 +151,11 @@ function setupPackage( r ){
     let pack = require( r.package );
     let install = [];
 
-    if( !( ( 'feuid2' in pack.dependencies ) || 'feuid2' in pack.devDependencies ) ){
+    /*if( !( ( 'feuid2' in pack.dependencies ) || 'feuid2' in pack.devDependencies ) ){
         install.push( 'feuid2' );
-    }
-    if( !( ( 'pre-commit' in pack.dependencies ) || 'pre-commit' in pack.devDependencies ) ){
-        install.push( 'pre-commit' );
+    }*/
+    if( !( ( 'husky' in pack.dependencies ) || 'husky' in pack.devDependencies ) ){
+        install.push( 'husky' );
     }
 
     if( install.length ){
@@ -150,9 +169,10 @@ function setupPackage( r ){
         pack.scripts = {};
     }
 
+    /*
     let writePack = 0;
 
-    if( !( pack.scripts && pack.scripts.feuid2 ) ){
+	if( !( pack.scripts && pack.scripts.feuid2 ) ){
         pack.scripts.feuid2 = 'node ./node_modules/feuid2/bin/main.js';
         writePack = 1;
     }
@@ -174,6 +194,7 @@ function setupPackage( r ){
     if( writePack ){
         fs.writeFileSync( r.package, JSON.stringify( pack, null, 2 ), { encoding: projectInfo.feuid2.encoding || 'utf8' } )
     }
+	*/
 }
 
 function installPack( install, r ){
@@ -181,7 +202,7 @@ function installPack( install, r ){
     if( shell.which( 'yarn' ) ){
         cmd = `yarn add ${install.join(' ')}`
     }else if( shell.which( 'npm' ) ){
-        cmd = `npm install ${install.join(' ')}`
+        cmd = `npm install ${install.join(' ')} --dev`
     }
 
     if( cmd ){

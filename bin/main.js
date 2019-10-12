@@ -29,7 +29,7 @@ var compareVersions = require('compare-versions');
 
 var program = require('commander');
 
-program.version(packJSON.version).option('-a, --auto', '使用 -s 初始化项目配置，并执行 -f 全量匹配并添加唯一ID').option('-s, --setup', '初始化项目配置，在根目录下生成feuid2.js、package.json添加pre-commit勾子').option('-f, --full', '处理所有匹配的文件').option('-t, --target <target>', '处理指定文件').option('-u, --update', '更新已经生成的唯一ID').option('-p, --path <path>', '自定义项目路径，默认为当前路径');
+program.version(packJSON.version).option('-a, --auto', '使用 -s 初始化项目配置，并执行 -f 全量匹配并添加唯一ID').option('-s, --setup', '初始化项目配置，在根目录下生成feuid2.config.js、.huskyrc.json').option('-f, --full', '处理所有匹配的文件').option('-t, --target <target>', '处理指定文件').option('-u, --update', '更新已经生成的唯一ID').option('-p, --path <path>', '自定义项目路径，默认为当前路径');
 program.parse(process.argv);
 
 if (program.auto) {
@@ -43,6 +43,7 @@ var projectInfo = resolveProjectInfo(PROJECT_ROOT);
 resolveConfig(projectInfo);
 setupPackage(projectInfo);
 setupConfig(projectInfo);
+setupHusky(projectInfo);
 
 PROJECT_ROOT = projectInfo.projectRoot;
 GIT_DIR = projectInfo.gitRoot;
@@ -119,6 +120,23 @@ function setupConfig(r) {
     }
 }
 
+function setupHusky(r) {
+    if (!program.setup) return;
+    var projectConfig = r.projectRoot + '/.huskyrc.json';
+    var modConfig = r.projectRoot + '/node_modules/feuid2/.huskyrc.json';
+    var appConfig = r.appRoot + '/.huskyrc.json';
+
+    if (!fs.existsSync(projectConfig)) {
+        var target = fs.existsSync(modConfig) ? modConfig : '';
+        if (!target) {
+            target = fs.existsSync(appConfig) ? appConfig : '';
+        }
+        if (target) {
+            fs.copyFileSync(target, projectConfig);
+        }
+    }
+}
+
 function setupPackage(r) {
     if (!program.setup) return;
 
@@ -130,11 +148,11 @@ function setupPackage(r) {
     var pack = require(r.package);
     var install = [];
 
-    if (!('feuid2' in pack.dependencies || 'feuid2' in pack.devDependencies)) {
-        install.push('feuid2');
-    }
-    if (!('pre-commit' in pack.dependencies || 'pre-commit' in pack.devDependencies)) {
-        install.push('pre-commit');
+    /*if( !( ( 'feuid2' in pack.dependencies ) || 'feuid2' in pack.devDependencies ) ){
+        install.push( 'feuid2' );
+    }*/
+    if (!('husky' in pack.dependencies || 'husky' in pack.devDependencies)) {
+        install.push('husky');
     }
 
     if (install.length) {
@@ -148,30 +166,29 @@ function setupPackage(r) {
         pack.scripts = {};
     }
 
-    var writePack = 0;
-
-    if (!(pack.scripts && pack.scripts.feuid2)) {
+    /*
+    let writePack = 0;
+    if( !( pack.scripts && pack.scripts.feuid2 ) ){
         pack.scripts.feuid2 = 'node ./node_modules/feuid2/bin/main.js';
         writePack = 1;
     }
-
-    if (!pack['pre-commit']) {
-        pack['pre-commit'] = ['feuid2'];
+     if( !pack['pre-commit'] ){
+        pack['pre-commit'] = [ 'feuid2'];
         writePack = 1;
     }
-    if (!pack['pre-commit'].toString().indexOf('feuid2') > -1) {
-        if (typeof pack['pre-commit'] == 'string') {
+    if( !pack['pre-commit'].toString().indexOf( 'feuid2' ) > -1 ){
+        if( typeof pack['pre-commit'] == 'string' ){
             pack['pre-commit'] += ',feuid2';
             writePack = 1;
-        } else if (typeof pack['pre-comit'] == 'array') {
-            pack['pre-commit'].push('feuid2');
+        }else if( typeof pack['pre-comit'] == 'array' ){
+            pack['pre-commit'].push( 'feuid2' );
             writePack = 1;
         }
     }
-
-    if (writePack) {
-        fs.writeFileSync(r.package, JSON.stringify(pack, null, 2), { encoding: projectInfo.feuid2.encoding || 'utf8' });
+     if( writePack ){
+        fs.writeFileSync( r.package, JSON.stringify( pack, null, 2 ), { encoding: projectInfo.feuid2.encoding || 'utf8' } )
     }
+    */
 }
 
 function installPack(install, r) {
@@ -179,7 +196,7 @@ function installPack(install, r) {
     if (shell.which('yarn')) {
         cmd = 'yarn add ' + install.join(' ');
     } else if (shell.which('npm')) {
-        cmd = 'npm install ' + install.join(' ');
+        cmd = 'npm install ' + install.join(' ') + ' --dev';
     }
 
     if (cmd) {
