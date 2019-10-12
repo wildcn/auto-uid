@@ -90,7 +90,7 @@
 
 ## git hook 配置文件 .huskyrc.json
 	{
-	  "hooks": {
-		"pre-commit": [ "node ./node_modules/feuid2/bin/main.js" ]
-	  }
+		"hooks": {
+			"pre-commit": [ "node ./node_modules/feuid2/bin/main.js" ]
+		}
 	}
