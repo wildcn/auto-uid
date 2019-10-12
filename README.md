@@ -45,10 +45,9 @@
 ### 设置提交勾子指令: feuid2 --setup 
     cd projectRoot && feuid2 --setup
     
-    # 这个指令自动添加2个npm模块 feuid2、pre-commit
-    # 并在 package.json 的 scripts 添加 feuid2 指令
-    # 和在 package.json 添加 pre-commit: ["feuid2"] 设置
+    # 这个指令自动添加2个npm模块 feuid2、husky
     # 拷贝 feuid2 模块里的 feuid2.config.js 到项目根目录
+    # 拷贝 feuid2 模块里的 .huskyrc.json 到项目根目录
     
 ### 处理所有文件指令: feuid2 --full 
     cd projectRoot && feuid2 --full
@@ -87,4 +86,11 @@
 	    , "fixrepeat": true                 //如果唯一ID重复自动去重
 	    //忽略处理的标签名
 	    , "ignoretag": [ "v-hover", "template", "el-table-column" ]   
+	}
+
+## git hook 配置文件 .huskyrc.json
+	{
+	  "hooks": {
+		"pre-commit": [ "node ./node_modules/feuid2/bin/main.js" ]
+	  }
 	}
