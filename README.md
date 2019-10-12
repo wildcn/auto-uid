@@ -29,6 +29,7 @@
 ### 执行后
 ![after-execute.png](http://p9.qhimg.com/d/inn/4dd249a9/after-execute.png)
 
+### package.json
 ![package.json.png](https://hnjd-fe.github.io/feuid2/docs/images/package.json.png)
 
 ## 安装全局指令
