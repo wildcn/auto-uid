@@ -219,9 +219,9 @@ function setupPackage(r) {
 function installPack(install, r) {
     var cmd = '';
     if (shell.which('yarn')) {
-        cmd = 'yarn add ' + install.join(' ');
+        cmd = 'yarn add ' + install.join(' ') + ' --dev';
     } else if (shell.which('npm')) {
-        cmd = 'npm install ' + install.join(' ') + ' --dev';
+        cmd = 'npm install -D ' + install.join(' ');
     }
 
     if (cmd) {
