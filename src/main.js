@@ -136,6 +136,31 @@ function setupHusky( r ){
         if( target ){
             fs.copyFileSync( target, projectConfig );
         }
+    }else{
+        let target = fs.existsSync( modConfig ) ? modConfig : '';
+        if( !target ){
+            target = fs.existsSync( appConfig ) ? appConfig : '';
+        }
+        if( target ){
+            let tmp = require( target ), exists = require( projectConfig ) ;
+            let cmd = tmp.hooks['pre-commit'];
+
+            if( exists.hooks ){
+                if( exists.hooks[ 'pre-commit' ] && exists.hooks[ 'pre-commit' ] ){
+                    if( !/feuid2/.test( exists.hooks[ 'pre-commit' ].toString() ) ){
+                        if( typeof exists.hooks[ 'pre-commit' ] == 'string' ){
+                            exists.hooks[ 'pre-commit' ] = exists.hooks[ 'pre-commit' ] + ' && ' + cmd[0]; 
+                        }else{
+                            exists.hooks[ 'pre-commit' ].push( cmd[0] );
+                        }
+                    }
+                }else{
+                    exists.hooks[ 'pre-commit' ] = cmd;
+                }
+                fs.writeFileSync( projectConfig, JSON.stringify( exists, null, 2 ), { encoding: projectInfo.feuid2.encoding || 'utf8' } )
+            } 
+
+        }
     }
 }
 
