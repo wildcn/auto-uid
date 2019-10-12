@@ -21,7 +21,7 @@
 ## 执行效果
 
 ### 执行流程
-![feuid2-commit-flow.png](http://p6.qhimg.com/d/inn/06dfd366/images/feuid2-commit-flow.png)
+![feuid2-commit-flow.png](http://p6.qhimg.com/d/inn/06dfd366/images/feuid-commit-flow.png)
 
 ### 执行前
 ![pre-execute.png](http://p8.qhimg.com/d/inn/06dfd366/images/pre-execute.png)
