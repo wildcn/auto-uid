@@ -33,16 +33,16 @@ export default class ProjectReplaceVUE extends Project {
         //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
         this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
 
-        this.attrnameRe = new RegExp( `${this.info.feuid.attrname}[\\s]*?\\=`, 'i');
-        this.fixEmptyRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`, 'ig');
-        this.fixRepeatRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`, 'ig');
+        this.attrnameRe = new RegExp( `${this.info.feuid2.attrname}[\\s]*?\\=`, 'i');
+        this.fixEmptyRe = new RegExp( `(${this.info.feuid2.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`, 'ig');
+        this.fixRepeatRe = new RegExp( `(${this.info.feuid2.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`, 'ig');
         this.firstSpaceRe = /^([\s]|>)/;
         this.lastSpaceRe = /[\s]$/;
         this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
-        if( this.info.feuid.ignoretag && this.info.feuid.ignoretag.length ){
-            //this.info.feuid.ignoretag.remove( 'template' );
-            this.ignoreTagRe = new RegExp( `^<(${this.info.feuid.ignoretag.join('|')})\\b`, 'i');
+        if( this.info.feuid2.ignoretag && this.info.feuid2.ignoretag.length ){
+            //this.info.feuid2.ignoretag.remove( 'template' );
+            this.ignoreTagRe = new RegExp( `^<(${this.info.feuid2.ignoretag.join('|')})\\b`, 'i');
         }
 
         this.getChangeFiles();
@@ -58,7 +58,7 @@ export default class ProjectReplaceVUE extends Project {
             this.curCount = 0;
             this.curFilepath = filepath;
 
-            this.curContent = fs.readFileSync( filepath, { encoding: this.info.feuid.encoding || 'utf8' } );
+            this.curContent = fs.readFileSync( filepath, { encoding: this.info.feuid2.encoding || 'utf8' } );
 
             //let tagInfo = this.getTag( 'div', filepath, 1 );
             this.tagInfo = this.getTag( 'template', filepath, 0 );
@@ -74,8 +74,8 @@ export default class ProjectReplaceVUE extends Project {
             });
 
             if( this.tagInfo.content != this.tagInfo.newContent ){
-                console.log( success( 'feuid update file:' ), success( filepath ) );
-                fs.writeFileSync( filepath, this.tagInfo.newContent, { encoding: this.info.feuid.encoding || 'utf8' } )
+                console.log( success( 'feuid2 update file:' ), success( filepath ) );
+                fs.writeFileSync( filepath, this.tagInfo.newContent, { encoding: this.info.feuid2.encoding || 'utf8' } )
                 shell.exec( `cd '${this.info.projectRoot}' && git add ${filepath}`, { silent: true } )
             }
 
@@ -92,7 +92,7 @@ export default class ProjectReplaceVUE extends Project {
 
         if( p.app.program.update ){
             content = content.replace( this.fixRepeatRe, function( $0, $1, $2, $3 ){
-                return `${$1}${$2}${info.feuid.idprefix}${p.getUuid()}${$2}`;
+                return `${$1}${$2}${info.feuid2.idprefix}${p.getUuid()}${$2}`;
             });
         }
 
@@ -103,10 +103,10 @@ export default class ProjectReplaceVUE extends Project {
             return `${$1}${$2}${key}${$2}`;
         });
 
-        if( info.feuid.fixempty ){
+        if( info.feuid2.fixempty ){
             content = this.fixEmpty( content );
         }
-        if( info.feuid.fixrepeat){
+        if( info.feuid2.fixrepeat){
             content = this.fixRepeat( content );
         }
         content = content.replace( p.tagContentRe, function( $0, $1, $2, $3 ){
@@ -119,7 +119,7 @@ export default class ProjectReplaceVUE extends Project {
             }
 
             if( !p.attrnameRe.test( $2 ) ){
-                uid = `${info.feuid.attrname}="${info.feuid.idprefix}${p.getUuid()}"`
+                uid = `${info.feuid2.attrname}="${info.feuid2.idprefix}${p.getUuid()}"`
                 if( !p.lastSpaceRe.test( $2 ) ){
                     uid = ' ' + uid;
                 }
@@ -129,9 +129,9 @@ export default class ProjectReplaceVUE extends Project {
             return r;
         });
         //repeat list add count
-        let countattrname = info.feuid.countattrname || 'data-feuidindex';
+        let countattrname = info.feuid2.countattrname || 'data-feuidindex';
         let countReName = new RegExp( `(\\:${countattrname}.*?\\=)('|")(.*?)\\2`, 'ig' );
-        let attrnameExists =  new RegExp( `${info.feuid.attrname}\\b`, 'i');
+        let attrnameExists =  new RegExp( `${info.feuid2.attrname}\\b`, 'i');
         let countattrnameExists= new RegExp(`\\:${countattrname}\\b`, 'i');
         let vkeyRe = /\:key\b/i;
 
@@ -197,11 +197,11 @@ export default class ProjectReplaceVUE extends Project {
         });
 
         for( let key in repeatObj ){
-            let fixRe = new RegExp( `(${this.info.feuid.attrname}[\\s]*?\\=)('|")(${key})?\\2`, 'ig');
+            let fixRe = new RegExp( `(${this.info.feuid2.attrname}[\\s]*?\\=)('|")(${key})?\\2`, 'ig');
             count = 0;
             content = content.replace( fixRe, function($0, $1, $2, $3){
                 if( count ){
-                    $3 = this.info.feuid.idprefix + p.getUuid();
+                    $3 = this.info.feuid2.idprefix + p.getUuid();
                 }
                 count++;
                 return `${$1}${$2}${$3}${$2}`;
@@ -216,7 +216,7 @@ export default class ProjectReplaceVUE extends Project {
         let p = this;
 
         content = content.replace( this.fixEmptyRe, function( $0, $1, $2, $3 ){
-            return `${$1}${$2}${this.info.feuid.idprefix}${p.getUuid()}${$2}`;
+            return `${$1}${$2}${this.info.feuid2.idprefix}${p.getUuid()}${$2}`;
         });
 
         return content;

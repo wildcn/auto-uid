@@ -27,10 +27,10 @@ export default class Project {
         this.modifiedFile = [];
         this.allFile = [];
 
-        this.info.feuid.dir.map( ( item, index ) => {
-            this.info.feuid.dir[index] = item.replace( /[\/]+$/, '' );
+        this.info.feuid2.dir.map( ( item, index ) => {
+            this.info.feuid2.dir[index] = item.replace( /[\/]+$/, '' );
         });
-        this.dirRe = new RegExp( `^(${this.info.feuid.dir.join('|')})\/`, 'i');
+        this.dirRe = new RegExp( `^(${this.info.feuid2.dir.join('|')})\/`, 'i');
 
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
@@ -52,8 +52,8 @@ export default class Project {
 
         if( this.app.program.full ){
 
-            p.info.feuid.dir.map( ( item ) => {
-                let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid.extension.join('|')})`;
+            p.info.feuid2.dir.map( ( item ) => {
+                let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid2.extension.join('|')})`;
                 p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
             });
 

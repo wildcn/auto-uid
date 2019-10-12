@@ -1,12 +1,12 @@
 
-# feuid
+# feuid2
 
 ## 使用说明
     提交代码自动为标签添加 唯一ID 属性
 
     使用原理：git commit 时使用 pre-commit 勾子对已经 git add 的文件里对所有 tag 添加唯一ID属性
     
-    解决疼点：UI 自动化测试时，页面上标签的标识变更导致UI测试用例需要重写, feuid 主要为了减少ID变更造成的影响
+    解决疼点：UI 自动化测试时，页面上标签的标识变更导致UI测试用例需要重写, feuid2 主要为了减少ID变更造成的影响
     
 ## 适用范围
     * 使用 git 管理的项目
@@ -16,12 +16,12 @@
     * 使用 vue 框架的前端项目
 
 ## 一键初始化 (切换到项目根目录, 然后执行以下命令)(执行完这条命令之后以后每次commit的时候会自动生成唯一ID)
-    sudo npm install -g feuid && feuid --auto
+    sudo npm install -g feuid2 && feuid2 --auto
     
 ## 执行效果
 
 ### 执行流程
-![feuid-commit-flow.png](http://p6.qhimg.com/d/inn/06dfd366/images/feuid-commit-flow.png)
+![feuid2-commit-flow.png](http://p6.qhimg.com/d/inn/06dfd366/images/feuid2-commit-flow.png)
 
 ### 执行前
 ![pre-execute.png](http://p8.qhimg.com/d/inn/06dfd366/images/pre-execute.png)
@@ -33,47 +33,47 @@
 ![package.json.png](http://p0.qhimg.com/d/inn/06dfd366/images/package.json.png)
 
 ## 安装全局指令
-    sudo npm install -g feuid
+    sudo npm install -g feuid2
 
-## 设置提交勾子与处理所有文件指令: feuid --auto 
-    cd projectRoot && feuid --auto
+## 设置提交勾子与处理所有文件指令: feuid2 --auto 
+    cd projectRoot && feuid2 --auto
     
-    # feuid --auto = feuid --setup && feuid --full
+    # feuid2 --auto = feuid2 --setup && feuid2 --full
     
 ## 其他操作
     
-### 设置提交勾子指令: feuid --setup 
-    cd projectRoot && feuid --setup
+### 设置提交勾子指令: feuid2 --setup 
+    cd projectRoot && feuid2 --setup
     
-    # 这个指令自动添加2个npm模块 feuid、pre-commit
-    # 并在 package.json 的 scripts 添加 feuid 指令
-    # 和在 package.json 添加 pre-commit: ["feuid"] 设置
-    # 拷贝 feuid 模块里的 feuid.config.js 到项目根目录
+    # 这个指令自动添加2个npm模块 feuid2、pre-commit
+    # 并在 package.json 的 scripts 添加 feuid2 指令
+    # 和在 package.json 添加 pre-commit: ["feuid2"] 设置
+    # 拷贝 feuid2 模块里的 feuid2.config.js 到项目根目录
     
-### 处理所有文件指令: feuid --full 
-    cd projectRoot && feuid --full
+### 处理所有文件指令: feuid2 --full 
+    cd projectRoot && feuid2 --full
     
     # 处理所有符合条件的文件
     
-### 处理指定文件指令: feuid --target 
-    cd projectRoot && feuid --target ./filepath.vue
+### 处理指定文件指令: feuid2 --target 
+    cd projectRoot && feuid2 --target ./filepath.vue
     
     # 处理单个指定的文件
     
-### 更新已经生成的唯一ID: feuid --update
-    feuid --full --update
+### 更新已经生成的唯一ID: feuid2 --update
+    feuid2 --full --update
     
     # 通常与 --full 或者 --target 结合使用
     
-### 显示帮助指令: feuid --help
-    feuid --help
+### 显示帮助指令: feuid2 --help
+    feuid2 --help
     
     # 显示所有可用命令
     
-## 参数配置文件 feuid.config.js
-	如果运行命令的项目根目录有 feuid.config.js，工具会自动读取配置参数
+## 参数配置文件 feuid2.config.js
+	如果运行命令的项目根目录有 feuid2.config.js，工具会自动读取配置参数
 
-## feuid.config.js 说明
+## feuid2.config.js 说明
 	{
 	    "extension": [ 'vue' ]              //需要处理的文件后缀名
 	    , "language": "vue"                 //处理标签的前端框架，目前只支持 vue, 未来会支持 react、angular

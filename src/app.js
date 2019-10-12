@@ -40,12 +40,12 @@ export default class App {
 
     init() {
         if( (!shell.which( 'git' ) ) ){
-            console.error( error( 'feuid - git not exists' ) );
+            console.error( error( 'feuid2 - git not exists' ) );
             return;
         }
 
         if( (!fs.existsSync( `${this.projectInfo.gitRoot}/.git` ) ) ){
-            console.error( error( 'feuid - dir is not git' ) );
+            console.error( error( 'feuid2 - dir is not git' ) );
             return;
         }
 

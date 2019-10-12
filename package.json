@@ -1,10 +1,10 @@
 {
-  "name": "feuid",
+  "name": "feuid2",
   "version": "1.0.22",
   "description": "frontend unique id",
   "main": "src/main.js",
   "bin": {
-    "feuid": "bin/main.js"
+    "feuid2": "bin/main.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,10 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hnjd-fe/feuid.git"
+    "url": "git+https://github.com/hnjd-fe/feuid2.git"
   },
   "keywords": [
-    "feuid",
+    "feuid2",
     "env",
     "init",
     "node",
@@ -26,9 +26,9 @@
   "author": "suches <908202921@qq.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hnjd-fe/feuid/issues"
+    "url": "https://github.com/hnjd-fe/feuid2/issues"
   },
-  "homepage": "https://github.com/hnjd-fe/feuid#readme",
+  "homepage": "https://github.com/hnjd-fe/feuid2#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0"
