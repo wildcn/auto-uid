@@ -148,9 +148,9 @@ function setupPackage(r) {
     var pack = require(r.package);
     var install = [];
 
-    /*if( !( ( 'feuid2' in pack.dependencies ) || 'feuid2' in pack.devDependencies ) ){
-        install.push( 'feuid2' );
-    }*/
+    if (!('feuid2' in pack.dependencies || 'feuid2' in pack.devDependencies)) {
+        install.push('feuid2');
+    }
     if (!('husky' in pack.dependencies || 'husky' in pack.devDependencies)) {
         install.push('husky');
     }
