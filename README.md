@@ -57,7 +57,7 @@
 ### 处理指定文件指令: feuid2 --target 
     cd projectRoot && feuid2 --target ./filepath.vue
     
-    # 处理单个指定的文件
+    # 处理单个指定的文件 
     
 ### 更新已经生成的唯一ID: feuid2 --update
     feuid2 --full --update
