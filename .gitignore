@@ -1,4 +1,5 @@
 node_modules
 .svn
 yarn.lock
+yarn-error.log
 testdata
