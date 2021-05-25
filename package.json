@@ -1,13 +1,13 @@
 {
-  "name": "feuid2",
+  "name": "feuid3",
   "version": "1.0.2",
   "description": "frontend unique id",
   "main": "src/main.js",
   "bin": {
-    "feuid2": "bin/main.js"
+    "feuid3": "src/main.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "babel-node src/main.js -r test -u",
     "serve": "babel -w src/ -d bin/",
     "build": "babel src/ -d bin/"
   },
@@ -31,7 +31,8 @@
   "homepage": "https://github.com/hnjd-fe/feuid2#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0"
+    "babel-preset-env": "^1.7.0",
+    "husky": "^6.0.0"
   },
   "dependencies": {
     "babel-core": "^6.26.3",

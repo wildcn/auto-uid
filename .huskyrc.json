@@ -1,5 +1,7 @@
 {
   "hooks": {
-    "pre-commit": [ "node ./node_modules/feuid2/bin/main.js" ]
+    "pre-commit": [
+      "node ./node_modules/feuid2/bin/main.js"
+    ]
   }
 }

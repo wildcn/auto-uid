@@ -26,6 +26,7 @@ export default class Project {
         this.newFile = [];
         this.modifiedFile = [];
         this.allFile = [];
+        this.allRelativeFile = [];
 
         this.info.feuid2.dir.map( ( item, index ) => {
             this.info.feuid2.dir[index] = item.replace( /[\/]+$/, '' );
@@ -51,18 +52,26 @@ export default class Project {
         let p = this;
 
         if( this.app.program.full ){
-
             p.info.feuid2.dir.map( ( item ) => {
                 let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid2.extension.join('|')})`;
                 p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
+                p.allRelativeFile = p.allFile.concat( glob.sync( globRe, {} ) );
             });
-
             return;
+        }
+
+        if (this.app.program.dir) {
+          this.app.program.dir.split(',').map( ( item ) => {
+            let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid2.extension.join('|')})`;
+            p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
+            p.allRelativeFile = p.allFile.concat( glob.sync( globRe, {} ) );
+        });
         }
 
         if( this.app.program.target ){
             console.log( this.app.program.target );
             p.allFile.push( path.resolve( this.app.program.target ) );
+            p.allRelativeFile.push(this.app.program.target)
             return;
         }
 

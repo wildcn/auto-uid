@@ -59,6 +59,7 @@ var Project = function () {
         this.newFile = [];
         this.modifiedFile = [];
         this.allFile = [];
+        this.allRelativeFile = [];
 
         this.info.feuid2.dir.map(function (item, index) {
             _this.info.feuid2.dir[index] = item.replace(/[\/]+$/, '');
@@ -87,18 +88,26 @@ var Project = function () {
             var p = this;
 
             if (this.app.program.full) {
-
                 p.info.feuid2.dir.map(function (item) {
                     var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.feuid2.extension.join('|') + ")";
                     p.allFile = p.allFile.concat(glob.sync(globRe, {}));
+                    p.allRelativeFile = p.allFile.concat(glob.sync(globRe, {}));
                 });
-
                 return;
+            }
+
+            if (this.app.program.dir) {
+                this.app.program.dir.split(',').map(function (item) {
+                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.feuid2.extension.join('|') + ")";
+                    p.allFile = p.allFile.concat(glob.sync(globRe, {}));
+                    p.allRelativeFile = p.allFile.concat(glob.sync(globRe, {}));
+                });
             }
 
             if (this.app.program.target) {
                 console.log(this.app.program.target);
                 p.allFile.push(_path2.default.resolve(this.app.program.target));
+                p.allRelativeFile.push(this.app.program.target);
                 return;
             }
 
