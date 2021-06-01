@@ -1,15 +1,13 @@
 let result = {
   extension: ["vue"],
   language: "vue",
-  repository: "git",
   dir: ["src"],
-  dist: "feuid3.dist.json",
+  dist: "auto-uid.dist.json",
   encoding: "utf8",
-  attrname: "data-testid",
-  countattrname: "data-feuidindex",
+  attrname: "data-auid",
   fixempty: true,
   fixrepeat: true,
-  idprefix: "fe",
+  idprefix: "",
   ignoretag: ["v-hover", "template", "el-table-column","v-else"]
 };
 

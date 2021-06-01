@@ -1,38 +1,39 @@
 {
-  "name": "feuid3",
-  "version": "1.0.2",
+  "name": "auto-uid",
+  "version": "1.0.0",
   "description": "frontend unique id",
-  "main": "src/main.js",
+  "main": "lib/main.js",
   "bin": {
-    "feuid3": "src/main.js"
+    "auto-uid": "lib/main.js"
   },
   "scripts": {
-    "test": "babel-node src/main.js -r test -u",
+    "test": "babel-node src/main.js -r test -W",
+    "clean": "babel-node src/main.js -c",
+    "node-test": "babel-node test/test.js",
     "serve": "babel -w src/ -d bin/",
     "build": "babel src/ -d bin/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hnjd-fe/feuid2.git"
+    "url": "git+https://github.com/wildcn/auto-uid.git"
   },
   "keywords": [
-    "feuid2",
+    "auto-uid",
     "env",
     "init",
     "node",
     "javascript",
     "suches"
   ],
-  "author": "suches <908202921@qq.com>",
+  "author": "dulianqiang <wildcn@qq.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hnjd-fe/feuid2/issues"
+    "url": "https://github.com/wildcn/auto-uid/issues"
   },
-  "homepage": "https://github.com/hnjd-fe/feuid2#readme",
+  "homepage": "https://github.com/wildcn/auto-uid#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "husky": "^6.0.0"
+    "babel-preset-env": "^1.7.0"
   },
   "dependencies": {
     "babel-core": "^6.26.3",

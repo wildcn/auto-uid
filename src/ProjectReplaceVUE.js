@@ -33,13 +33,13 @@ export default class ProjectReplaceVUE extends Project {
     //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
     this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
 
-    this.attrnameRe = new RegExp(`${this.info.feuid2.attrname}[\\s]*?\\=`, "i");
+    this.attrnameRe = new RegExp(`${this.info.autoUid.attrname}[\\s]*?\\=`, "i");
     this.fixEmptyRe = new RegExp(
-      `(${this.info.feuid2.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`,
+      `(${this.info.autoUid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`,
       "ig"
     );
     this.fixRepeatRe = new RegExp(
-      `(${this.info.feuid2.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`,
+      `(${this.info.autoUid.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`,
       "ig"
     );
     this.firstSpaceRe = /^([\s]|>)/;
@@ -47,12 +47,12 @@ export default class ProjectReplaceVUE extends Project {
     this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
 
     this.tempErrorAttrs = {}; // 支持jsx的错误parse，和v-else等空attrs
-    this.attrname = this.info.feuid2.attrname;
+    this.attrname = this.info.autoUid.attrname;
 
-    if (this.info.feuid2.ignoretag && this.info.feuid2.ignoretag.length) {
-      //this.info.feuid2.ignoretag.remove( 'template' );
+    if (this.info.autoUid.ignoretag && this.info.autoUid.ignoretag.length) {
+      //this.info.autoUid.ignoretag.remove( 'template' );
       this.ignoreTagRe = new RegExp(
-        `^<(${this.info.feuid2.ignoretag.join("|")})\\b`,
+        `^<(${this.info.autoUid.ignoretag.join("|")})\\b`,
         "i"
       );
     }
@@ -61,7 +61,7 @@ export default class ProjectReplaceVUE extends Project {
 
     // 读取dist配置
     this.distJson = {};
-    let dist = path.resolve(this.info.projectRoot, this.info.feuid2.dist);
+    let dist = path.resolve(this.info.projectRoot, this.info.autoUid.dist);
     if (fs.existsSync(dist)) {
       let distFileContent = fs.readFileSync(dist, {
         encoding: "utf-8"
@@ -90,7 +90,7 @@ export default class ProjectReplaceVUE extends Project {
       this.curFilepath = filepath;
 
       this.curContent = fs.readFileSync(filepath, {
-        encoding: this.info.feuid2.encoding || "utf8"
+        encoding: this.info.autoUid.encoding || "utf8"
       });
 
       //let tagInfo = this.getTag( 'div', filepath, 1 );
@@ -110,14 +110,100 @@ export default class ProjectReplaceVUE extends Project {
       });
 
       if (this.tagInfo.content != this.tagInfo.newContent) {
-        console.log(success("feuid2 update file:"), success(filepath));
+        console.log(success("auto-uid update file:"), success(filepath));
         fs.writeFileSync(filepath, this.tagInfo.newContent, {
-          encoding: this.info.feuid2.encoding || "utf8"
+          encoding: this.info.autoUid.encoding || "utf8"
         });
         shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
           silent: true
         });
       }
     });
+  }
+
+  getTag(tag, filepath, matchAll = false) {
+    let curIndex = 0;
+    let result = {
+      content: this.curContent,
+      newContent: this.curContent,
+      data: [],
+      filepath: filepath
+    };
+
+    let startReg = new RegExp(`<${tag}[^<\\/]*?>`, "i");
+    let endRe = new RegExp(`<\\/${tag}>`, "i");
+
+    while (true) {
+      let tmpContent = this.curContent.slice(curIndex);
+      let tmp = tmpContent.match(startReg);
+
+      if (!tmp) {
+        break;
+      }
+
+      //console.log( this.curFilepath );
+
+      let nextIndex = curIndex + tmp.index + 1;
+
+      let endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
+      let endIndex = endResult.end;
+
+      /*
+        console.log( curIndex + tmp.index, endIndex );
+        console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
+        */
+
+      if (endIndex) {
+        let data = {
+          fullTag: {
+            start: curIndex + tmp.index,
+            end: endIndex,
+            tagContent: this.curContent.slice(curIndex + tmp.index, endIndex)
+          },
+          innerTag: {
+            start: curIndex + tmp.index + tmp[0].length,
+            end: endResult.start
+          }
+        };
+        data.innerTag.tagContent = this.curContent.slice(
+          data.innerTag.start,
+          data.innerTag.end
+        );
+        result.data.unshift(data);
+      }
+
+      curIndex = nextIndex;
+      if (!matchAll) {
+        break;
+      }
+    }
+    return result;
+  }
+  matchEnd(nextIndex, startReg, endReg, tagLength) {
+    let r = { start: 0, end: 0 };
+
+    let endContent = this.curContent.slice(nextIndex);
+    let tmpEnd = endContent.match(endReg);
+
+    if (tmpEnd) {
+      let endMatch = this.curContent.slice(
+        nextIndex,
+        nextIndex + tmpEnd.index + tmpEnd[0].length
+      );
+      let tmpMatch = endMatch.match(startReg);
+      if (tmpMatch) {
+        r = this.matchEnd(
+          nextIndex + tmpEnd.index + tagLength,
+          startReg,
+          endReg,
+          tmpEnd[0].length
+        );
+      } else {
+        r.start = nextIndex + tmpEnd.index;
+        r.end = nextIndex + tmpEnd.index + tmpEnd[0].length;
+      }
+    }
+
+    return r;
   }
 }

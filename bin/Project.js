@@ -61,10 +61,10 @@ var Project = function () {
         this.allFile = [];
         this.allRelativeFile = [];
 
-        this.info.feuid2.dir.map(function (item, index) {
-            _this.info.feuid2.dir[index] = item.replace(/[\/]+$/, '');
+        this.info.autoUid.dir.map(function (item, index) {
+            _this.info.autoUid.dir[index] = item.replace(/[\/]+$/, '');
         });
-        this.dirRe = new RegExp("^(" + this.info.feuid2.dir.join('|') + ")/", 'i');
+        this.dirRe = new RegExp("^(" + this.info.autoUid.dir.join('|') + ")/", 'i');
 
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
@@ -87,9 +87,9 @@ var Project = function () {
         value: function getChangeFiles() {
             var p = this;
 
-            if (this.app.program.full) {
-                p.info.feuid2.dir.map(function (item) {
-                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.feuid2.extension.join('|') + ")";
+            if (this.app.program.full || this.app.program.clean) {
+                p.info.autoUid.dir.map(function (item) {
+                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.autoUid.extension.join('|') + ")";
                     p.allFile = p.allFile.concat(glob.sync(globRe, {}));
                     p.allRelativeFile = p.allFile.concat(glob.sync(globRe, {}));
                 });
@@ -98,7 +98,7 @@ var Project = function () {
 
             if (this.app.program.dir) {
                 this.app.program.dir.split(',').map(function (item) {
-                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.feuid2.extension.join('|') + ")";
+                    var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.autoUid.extension.join('|') + ")";
                     p.allFile = p.allFile.concat(glob.sync(globRe, {}));
                     p.allRelativeFile = p.allFile.concat(glob.sync(globRe, {}));
                 });

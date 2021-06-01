@@ -8,13 +8,14 @@ export default class ProcessFragment {
       .pop()
       .split(".")[0];
     this.distJson = root.distJson;
-    this.ignoretags = root.info.feuid2.ignoretag;
+    this.ignoretags = root.info.autoUid.ignoretag;
+    this.autoUid = root.info.autoUid;
     this.relativeFilePath = root.curFilepath.replace(
       new RegExp(process.cwd()),
       ""
     );
     this.program = root.app.program;
-    this.attrname = root.info.feuid2.attrname;
+    this.attrname = root.info.autoUid.attrname;
     this.generateIds = this.distJson[this.relativeFilePath] || {}; // 所有生成的id
     this.tempErrorAttrs = {}; //暂存jsx等引起的解析错误
   }
@@ -96,8 +97,15 @@ export default class ProcessFragment {
       }
     }
 
+    if (this.autoUid.idprefix) {
+      attrValue = this.info.autoUid.idprefix + attrValue;
+    } 
+
     this.generateIds[distJsonKey] = attrValue;
-    attrNamesObj[this.attrname] = attrValue;
+    if (this.program.write) {
+      // 写入dom
+      attrNamesObj[this.attrname] = attrValue;
+    }
     if (this.program.clean) {
       // 清除生成的id
       delete attrNamesObj[this.attrname];

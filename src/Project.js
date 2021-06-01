@@ -28,10 +28,10 @@ export default class Project {
         this.allFile = [];
         this.allRelativeFile = [];
 
-        this.info.feuid2.dir.map( ( item, index ) => {
-            this.info.feuid2.dir[index] = item.replace( /[\/]+$/, '' );
+        this.info.autoUid.dir.map( ( item, index ) => {
+            this.info.autoUid.dir[index] = item.replace( /[\/]+$/, '' );
         });
-        this.dirRe = new RegExp( `^(${this.info.feuid2.dir.join('|')})\/`, 'i');
+        this.dirRe = new RegExp( `^(${this.info.autoUid.dir.join('|')})\/`, 'i');
 
         this.newRe = /new[\s]+file:[\s]+(.*)/;
         this.modifiedRe = /modified:[\s]+(.*)/;
@@ -51,9 +51,9 @@ export default class Project {
     getChangeFiles(){
         let p = this;
 
-        if( this.app.program.full ){
-            p.info.feuid2.dir.map( ( item ) => {
-                let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid2.extension.join('|')})`;
+        if( this.app.program.full || this.app.program.clean){
+            p.info.autoUid.dir.map( ( item ) => {
+                let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.autoUid.extension.join('|')})`;
                 p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
                 p.allRelativeFile = p.allFile.concat( glob.sync( globRe, {} ) );
             });
@@ -62,7 +62,7 @@ export default class Project {
 
         if (this.app.program.dir) {
           this.app.program.dir.split(',').map( ( item ) => {
-            let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.feuid2.extension.join('|')})`;
+            let globRe = `${p.info.projectRoot}/${item}/**/*.+(${p.info.autoUid.extension.join('|')})`;
             p.allFile = p.allFile.concat( glob.sync( globRe, {} ) );
             p.allRelativeFile = p.allFile.concat( glob.sync( globRe, {} ) );
         });

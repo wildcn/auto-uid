@@ -77,12 +77,12 @@ var App = function () {
         key: "init",
         value: function init() {
             if (!_shelljs2.default.which('git')) {
-                console.error(error('feuid2 - git not exists'));
+                console.error(error('auto-uid - git not exists'));
                 return;
             }
 
             if (!_fsExtra2.default.existsSync(this.projectInfo.gitRoot + "/.git")) {
-                console.error(error('feuid2 - dir is not git'));
+                console.error(error('auto-uid - dir is not git'));
                 return;
             }
 
