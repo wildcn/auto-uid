@@ -18,7 +18,7 @@ let PROJECT_ROOT = process.env.PWD || process.cwd();
 let GIT_DIR = PROJECT_ROOT;
 
 const packJSON = require(`${APP_ROOT}/package.json`);
-const config = require(`${APP_ROOT}/config.json`);
+const config = require(`${APP_ROOT}/auto-uid.config.js`);
 const compareVersions = require("compare-versions");
 
 var program = require("commander");
@@ -31,13 +31,14 @@ program
   )
   .option(
     "-s, --setup",
-    "初始化项目配置，在根目录下生成auto-uid.config.js"
+    "初始化项目配置，在根目录下生成auto-uid.config.json"
   )
   .option("-f, --full", "处理所有匹配的文件")
   .option("-t, --target <target>", "处理指定文件")
   .option("-r, --dir <dir>", "处理指定目录下的文件,多目录以,分隔")
   .option("-u, --update", "更新已经生成的唯一ID")
   .option("-W, --write", "向dom中写入uid")
+  .option("-m, --dom", "使用dom结构替换uuid生成uid")
   .option("-p, --path <path>", "自定义项目路径，默认为当前路径")
   .option("-c, --clean", "清除已有的ID");
 

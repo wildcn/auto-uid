@@ -2,9 +2,9 @@
   "name": "auto-uid",
   "version": "1.0.0",
   "description": "frontend unique id",
-  "main": "lib/main.js",
+  "main": "bin/main.js",
   "bin": {
-    "auto-uid": "lib/main.js"
+    "auto-uid": "bin/main.js"
   },
   "scripts": {
     "test": "babel-node src/main.js -r test -W",

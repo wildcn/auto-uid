@@ -10,7 +10,7 @@
       "stopOnEntry": true,
       "runtimeArgs": [
         "run-script",
-        "clean"
+        "test"
       ],
       "runtimeExecutable": "npm",
       "skipFiles": [

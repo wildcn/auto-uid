@@ -25,6 +25,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+.vscode
 
 # personal configs
 webpack.config.js

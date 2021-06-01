@@ -5,14 +5,15 @@
     提交代码自动为标签添加 唯一ID 属性
 
     解决疼点：UI 自动化测试时，页面上标签的标识变更导致UI测试用例需要重写, auto-uid 主要为了减少ID变更造成的影响
-    
+
 ## 相对于feuid2的改动
 
-- 基于parse5解析，而非正则
-- 可选择不侵入源码，而在编译流程中加入uid
+- 基于parse5解析代码块
+- 可配置不侵入源码，而在编译流程中加入uid
 - 支持生成uid对应的map表，并可自定义任意的uid
 - 支持写入和清空
 - 可根据dom结构生成语义化的uid
+- 支持修改配置文件自定义uid
 
 ## 适用范围
     * 使用 git 管理的项目
@@ -80,6 +81,9 @@
 
 ### 清空dom中写入的uid: auto-uid --clean
     auto-uid --full --clean
+
+### 使用dom结构对应的uid代替uuid: auto-uid --dom
+    auto-uid --full --dom
     
 ### dom中写入的uid: auto-uid --write
     auto-uid --full --write
@@ -100,7 +104,7 @@
 	    , "encoding": "utf8"                //项目中的文件编码
 	    , "attrname": "data-testid"         //唯一ID的属性名
 	    , "idprefix": ""                    //唯一ID属性值的前缀名
-	    , "dist": "auto-uid.dist.json",     //生成UID与DOM对应的MAP
+	    , "dist": "auto-uid.dist.json",     //生成UID与DOM对应的MAP，如需自定义，请修改该文件后重新运行
 	    , "fixempty": true                  //如果唯一ID属性为空自动修复
 	    , "fixrepeat": true                 //如果唯一ID重复自动去重
 	    //忽略处理的标签名

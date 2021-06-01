@@ -24,6 +24,8 @@ var ProcessFragment = function () {
     this.attrname = root.info.autoUid.attrname;
     this.generateIds = this.distJson[this.relativeFilePath] || {}; // 所有生成的id
     this.tempErrorAttrs = {}; //暂存jsx等引起的解析错误
+
+    this.uniqIds = {};
   }
 
   _createClass(ProcessFragment, [{
@@ -94,11 +96,22 @@ var ProcessFragment = function () {
       if (!attrValue || this.program.update) {
         // 更新attr
         if (attrNamesObj.id) {
-          attrValue = "id#" + attrNamesObj.id.value;
+          attrValue = "id#" + (attrNamesObj.id.value || attrNamesObj.id);
         } else if (attrNamesObj.class) {
           attrValue = "class." + (attrNamesObj.class.value || attrNamesObj.class);
+        } else if (this.program.dom) {
+          attrValue = fullTagPath;
         } else {
           attrValue = Uuid().replace(/-/g, "").slice(0, 12);
+        }
+      }
+      // attrValue去重
+      if (!/@/g.test(attrValue)) {
+        if (this.uniqIds[attrValue]) {
+          this.uniqIds[attrValue]++;
+          attrValue += "@" + this.uniqIds[attrValue];
+        } else {
+          this.uniqIds[attrValue] = 1;
         }
       }
 
