@@ -7,7 +7,7 @@
     "auto-uid": "bin/main.js"
   },
   "scripts": {
-    "test": "babel-node src/main.js -r test -W",
+    "test": "babel-node src/main.js -t test/app-main.vue -W",
     "clean": "babel-node src/main.js -c",
     "node-test": "babel-node test/test.js",
     "serve": "babel -w src/ -d bin/",

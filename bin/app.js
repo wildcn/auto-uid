@@ -80,6 +80,8 @@ var App = function () {
                 console.error(error('auto-uid - git not exists'));
                 return;
             }
+            // 检查git缓存区
+
 
             if (!_fsExtra2.default.existsSync(this.projectInfo.gitRoot + "/.git")) {
                 console.error(error('auto-uid - dir is not git'));

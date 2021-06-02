@@ -35,8 +35,7 @@ var ProcessFragment = function () {
 
       var info = this.info;
       var p = this;
-      var htmlFragmentParse = parse5.parseFragment(content);
-
+      var htmlFragmentParse = parse5.parseFragment(this.fixSingleTag(content));
       // 遍历处理所有的nodes
       htmlFragmentParse.childNodes = htmlFragmentParse.childNodes.map(function (node, index) {
         return _this.readNodes({
@@ -95,9 +94,9 @@ var ProcessFragment = function () {
       var attrValue = this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
       if (!attrValue || this.program.update) {
         // 更新attr
-        if (attrNamesObj.id) {
+        if (attrNamesObj.id && this.program.byName) {
           attrValue = "id#" + (attrNamesObj.id.value || attrNamesObj.id);
-        } else if (attrNamesObj.class) {
+        } else if (attrNamesObj.class && this.program.byName) {
           attrValue = "class." + (attrNamesObj.class.value || attrNamesObj.class);
         } else if (this.program.dom) {
           attrValue = fullTagPath;
@@ -180,6 +179,15 @@ var ProcessFragment = function () {
       });
 
       return tempAttrsObj;
+    }
+    // 处理所有的single tag ， 例如 <el-table-column /> 否则parse5会识别失败
+
+  }, {
+    key: "fixSingleTag",
+    value: function fixSingleTag(content) {
+      return content.replace(/<([^ ]+)([^\/>]+)\/>/g, function (text, $1, $2) {
+        return "<" + $1 + $2 + "></" + $1.replace(/\n/, "") + ">";
+      });
     }
   }]);
 

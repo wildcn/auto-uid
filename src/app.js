@@ -43,6 +43,8 @@ export default class App {
             console.error( error( 'auto-uid - git not exists' ) );
             return;
         }
+        // 检查git缓存区
+        
 
         if( (!fs.existsSync( `${this.projectInfo.gitRoot}/.git` ) ) ){
             console.error( error( 'auto-uid - dir is not git' ) );

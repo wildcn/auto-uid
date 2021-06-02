@@ -24,8 +24,7 @@ export default class ProcessFragment {
   process(content) {
     let info = this.info;
     let p = this;
-    let htmlFragmentParse = parse5.parseFragment(content);
-
+    let htmlFragmentParse = parse5.parseFragment(this.fixSingleTag(content));
     // 遍历处理所有的nodes
     htmlFragmentParse.childNodes = htmlFragmentParse.childNodes.map(
       (node, index) =>
@@ -88,9 +87,9 @@ export default class ProcessFragment {
       this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
     if (!attrValue || this.program.update) {
       // 更新attr
-      if (attrNamesObj.id) {
+      if (attrNamesObj.id && this.program.byName) {
         attrValue = `id#${attrNamesObj.id.value || attrNamesObj.id}`;
-      } else if (attrNamesObj.class) {
+      } else if (attrNamesObj.class && this.program.byName) {
         attrValue = `class.${attrNamesObj.class.value || attrNamesObj.class}`;
       } else if (this.program.dom) {
         attrValue = fullTagPath;
@@ -164,5 +163,11 @@ export default class ProcessFragment {
     });
 
     return tempAttrsObj;
+  }
+  // 处理所有的single tag ， 例如 <el-table-column /> 否则parse5会识别失败
+  fixSingleTag(content) {
+    return content.replace(/<([^ ]+)([^\/>]+)\/>/g, function(text, $1, $2) {
+      return `<${$1}${$2}></${$1.replace(/\n/, "")}>`;
+    });
   }
 }

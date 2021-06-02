@@ -37,6 +37,7 @@ program
   .option("-t, --target <target>", "处理指定文件")
   .option("-r, --dir <dir>", "处理指定目录下的文件,多目录以,分隔")
   .option("-u, --update", "更新已经生成的唯一ID")
+  .option("-n, --byname", "优先使用class或者id生成uuid")
   .option("-W, --write", "向dom中写入uid")
   .option("-m, --dom", "使用dom结构替换uuid生成uid")
   .option("-p, --path <path>", "自定义项目路径，默认为当前路径")

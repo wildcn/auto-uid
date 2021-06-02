@@ -33,7 +33,10 @@ export default class ProjectReplaceVUE extends Project {
     //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
     this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
 
-    this.attrnameRe = new RegExp(`${this.info.autoUid.attrname}[\\s]*?\\=`, "i");
+    this.attrnameRe = new RegExp(
+      `${this.info.autoUid.attrname}[\\s]*?\\=`,
+      "i"
+    );
     this.fixEmptyRe = new RegExp(
       `(${this.info.autoUid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`,
       "ig"
@@ -110,13 +113,13 @@ export default class ProjectReplaceVUE extends Project {
       });
 
       if (this.tagInfo.content != this.tagInfo.newContent) {
-        console.log(success("auto-uid update file:"), success(filepath));
+        console.log(success("[auto-uid] update file:"), success(filepath));
         fs.writeFileSync(filepath, this.tagInfo.newContent, {
           encoding: this.info.autoUid.encoding || "utf8"
         });
-        shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
-          silent: true
-        });
+        // shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
+        //   silent: true
+        // });
       }
     });
   }

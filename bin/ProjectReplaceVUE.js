@@ -133,13 +133,13 @@ var ProjectReplaceVUE = function (_Project) {
         });
 
         if (_this2.tagInfo.content != _this2.tagInfo.newContent) {
-          console.log(success("auto-uid update file:"), success(filepath));
+          console.log(success("[auto-uid] update file:"), success(filepath));
           _fsExtra2.default.writeFileSync(filepath, _this2.tagInfo.newContent, {
             encoding: _this2.info.autoUid.encoding || "utf8"
           });
-          shell.exec("cd '" + _this2.info.projectRoot + "' && git add " + filepath, {
-            silent: true
-          });
+          // shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
+          //   silent: true
+          // });
         }
       });
     }
