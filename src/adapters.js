@@ -1,9 +1,10 @@
 const { vueAttrsOrder } = require("./configs");
 const Uuid = require("uuid/v4");
-
+const { hasCapital } = require("./utils/str");
 const adapter = {
   tempErrorAttrs: {}, //暂存jsx等引起的解析错误
-  
+  upperCaseStrObj: {}, // 暂存所有的驼峰字符串
+
   // 根据vue eslit 规则为attr排序
   sortAttrsByLintRule(attrs) {
     // eslint vue/attributes-order  https://eslint.vuejs.org/rules/attributes-order.html
@@ -19,14 +20,52 @@ const adapter = {
     }
     return attrs.sort((a, b) => getOrderIndex(b.name) - getOrderIndex(a.name));
   },
-  
+
   // 删除忽略标签的value
   deleteIgnoreTagEmptyValue(str) {
     return str.replace(/=["']__CLEAN__["']/g, "");
   },
+  // parse5 会将所有的驼峰转换为小写，所以需要先暂存驼峰
+  readUpperCaseNodeName(str) {
+    return str.replace(/<[\/]*([a-zA-Z-]+)/g, function(matchStr, $1) {
+      if (hasCapital($1)) {
+        let key = $1.toLowerCase();
+        // parse5遇见table会解析错误
+        if (["table", "input"].indexOf(key) !== "-1") {
+          key = `div-${key}`;
+        }
+        adapter.upperCaseStrObj[key] = $1;
+        return matchStr.replace($1, key);
+      }
+      return matchStr;
+    });
+  },
+  filterUpperCaseStr(node) {
+    const { nodeName } = node;
+    // 删除不存在的nodeName Uppercase Cache
+    if (!adapter.upperCaseStrObj[nodeName]) {
+      delete adapter.upperCaseStrObj[nodeName];
+    }
+    return node;
+  },
+  revertUpperCaseNodeName(str) {
+    Object.keys(adapter.upperCaseStrObj).forEach(lowerNodeName => {
+      str = str.replace(
+        new RegExp(`(<[\/]*)(${lowerNodeName})([ >])`, "g"),
+        function(matchStr, $1, $2, $3) {
+          return `${$1}${adapter.upperCaseStrObj[lowerNodeName]}${$3}`;
+        }
+      );
+    });
+    return str;
+  },
   // 处理所有的single tag ， 例如 <el-table-column /> 否则parse5会识别失败
   completeSingleTag(content) {
-    return content.replace(/<([^\s\/>]+)([^(\/>)]+?)\/>/g, function(text, $1, $2) {
+    return content.replace(/<([^\s\/>]+)([^(\/>)]+?)\/>/g, function(
+      text,
+      $1,
+      $2
+    ) {
       return `<${$1}${$2}></${$1.replace(/\n/, "")}>`;
     });
   },
@@ -38,8 +77,6 @@ const adapter = {
       $2,
       $3
     ) {
-      console.log($1)
-      console.log($3)
       if ($1 === $3) {
         return `<${$1}${$2} />`;
       }
@@ -104,7 +141,7 @@ const adapter = {
       return ignoreTags;
     }
     attrs.forEach(item => {
-      if (ignoreTags.indexOf(item.name) !== -1) {
+      if (ignoreTags.indexOf(item.name) !== -1 || item.value === "") {
         item.value = "__CLEAN__";
       }
     });

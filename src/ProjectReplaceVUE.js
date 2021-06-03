@@ -62,7 +62,7 @@ module.exports = class ProjectReplaceVUE extends Project {
       this.template = [];
       this.curFilepath = filepath;
       this.curContent = fs.readFileSync(filepath, {
-        encoding: this.info.autoUid.encoding || "utf8"
+        encoding: this.info.autoUid.encoding || "utf-8"
       });
 
       this.tagInfo = this.getTag("template", filepath, 0);

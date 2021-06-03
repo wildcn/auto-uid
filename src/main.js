@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const { logSuc, logErr, logWar, logInfo } = require("./utils/debug");
+let { logSuc, logErr, logWar, logInfo } = require("./utils/debug");
 
 const fs = require("fs");
 const os = require("os");
@@ -46,6 +46,9 @@ class Run {
       program.setup = true;
       program.full = true;
       program.write = true;
+    }
+    if (!program.debug) {
+      logSuc = logInfo = i => i;
     }
 
     this.PROJECT_ROOT = program.path || PROJECT_ROOT;

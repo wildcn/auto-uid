@@ -1,81 +1,35 @@
 <template>
-  <div class="user-activity" data-auid="9985bb0aef4a">
-    <div class="post" data-auid="5bacd1bacbf9">
-      <div class="user-block" data-auid="c3e0a5d95b01">
-        <img class="img-circle" data-auid="f9e936785032" :src="'https://wpimg.wallstcn.com/57ed425a-c71e-4201-9428-68760c0537c4.jpg'+avatarPrefix">
-        <span class="username text-muted" data-auid="05c259cc0e1f">Iron Man</span>
-        <span class="description" data-auid="2721d8512ade">Shared publicly - 7:30 PM today</span>
-      </div>
-      <p data-auid="d27719ffa187">
-        Lorem ipsum represents a long-held tradition for designers,
-        typographers and the like. Some people hate it and argue for
-        its demise, but others ignore the hate as they create awesome
-        tools to help create filler text for everyone from bacon lovers
-        to Charlie Sheen fans.
-      </p>
-      <ul class="list-inline" data-auid="a84756208e8d">
-        <li data-auid="e1f2f5b05614">
-          <span class="link-black text-sm" data-auid="29c0304abda3">
-            <i class="el-icon-share" data-auid="ed2d7ea4162f"></i>
-            Share
-          </span>
-        </li>
-        <li data-auid="71a447253561">
-          <span class="link-black text-sm" data-auid="29c0304abda3@2">
-            <svg-icon icon-class="like" data-auid="17177e8fedf7"></svg-icon>
-            Like
-          </span>
-        </li>
-      </ul>
-    </div>
-    <div class="post" data-auid="6cce8a57bc66">
-      <div class="user-block" data-auid="c3e0a5d95b01@2">
-        <img class="img-circle" data-auid="f9e936785032@2" :src="'https://wpimg.wallstcn.com/9e2a5d0a-bd5b-457f-ac8e-86554616c87b.jpg'+avatarPrefix">
-        <span class="username text-muted" data-auid="05c259cc0e1f@2">Captain American</span>
-        <span class="description" data-auid="2721d8512ade@2">Sent you a message - yesterday</span>
-      </div>
-      <p data-auid="d27719ffa187@2">
-        Lorem ipsum represents a long-held tradition for designers,
-        typographers and the like. Some people hate it and argue for
-        its demise, but others ignore the hate as they create awesome
-        tools to help create filler text for everyone from bacon lovers
-        to Charlie Sheen fans.
-      </p>
-      <ul class="list-inline" data-auid="a84756208e8d@2">
-        <li data-auid="e1f2f5b05614@2">
-          <span class="link-black text-sm" data-auid="29c0304abda3@2">
-            <i class="el-icon-share" data-auid="ed2d7ea4162f@2"></i>
-            Share
-          </span>
-        </li>
-        <li data-auid="71a447253561@2">
-          <span class="link-black text-sm" data-auid="29c0304abda3@2">
-            <svg-icon icon-class="like" data-auid="17177e8fedf7@2"></svg-icon>
-            Like
-          </span>
-        </li>
-      </ul>
-    </div>
-    <div class="post" data-auid="bb92511b1906">
-      <div class="user-block" data-auid="c3e0a5d95b01@2">
-        <img class="img-circle" data-auid="f9e936785032@2" :src="'https://wpimg.wallstcn.com/fb57f689-e1ab-443c-af12-8d4066e202e2.jpg'+avatarPrefix">
-        <span class="username" data-auid="05c259cc0e1f@2">Spider Man</span>
-        <span class="description" data-auid="2721d8512ade@2">Posted 4 photos - 2 days ago</span>
-      </div>
-      <div class="user-images" data-auid="1dec68a372e4">
-        <el-carousel type="card" height="220px" data-auid="40b5235b58f8" :interval="6000">
-          <el-carousel-item v-for="item in carouselImages" :key="item" data-auid="f0d3db320a73">
-            <img class="image" data-auid="85e2568a6dd4" :src="item+carouselPrefix">
-          </el-carousel-item>
-        </el-carousel>
-      </div>
-      <ul class="list-inline" data-auid="a84756208e8d@2">
-        <li data-auid="e1f2f5b05614@2"><span class="link-black text-sm" data-auid="73b509ec4c8c"><i class="el-icon-share" data-auid="d33d51e5a2ef"></i> Share</span></li>
-        <li data-auid="71a447253561@2">
-          <span class="link-black text-sm" data-auid="29c0304abda3@2">
-            <svg-icon icon-class="like" data-auid="17177e8fedf7@2"></svg-icon> Like</span>
-        </li>
-      </ul>
-    </div>
+  <div data-auid="9985bb0aef4a">
+    <panel-template ref="panel-template" showsearch searchplaceholder="请输入姓名" showheader data-auid="ad8bad19b286" :total="total" :limit="20" :loading="loading" @query="handleParamsSearch">
+      <staff-selector slot="buttons" buttontype="primary" data-auid="fcae170f8c4a" :value="selectStaffs" :maxcount="10" @input="selectStaff">
+        <span slot="button-name" data-auid="127cb44c3dbf">新增主播</span>
+      </staff-selector>
+      <div class="total" data-auid="9bee59c6b291">共有{{ total }}名主播</div>
+      <Table class="table" data-auid="19ac9f88c1c1" :data="owners">
+        <TableColumn prop="name" label="姓名" width="200" show-overflow-tooltip data-auid="79544274286a"></TableColumn>
+        <TableColumn label="所属部门" width="236" data-auid="08ef60d097b9">
+          <template slot-scope="{ row }">
+            <sector-column data-auid="1b257a5ec9cd" :sectors="get(row, 'departments', [])"></sector-column>
+          </template>
+        </TableColumn>
+        <TableColumn label="状态" prop="status" width="100" data-auid="df892f039760">
+          <template slot-scope="scope">
+            <status-badge data-auid="86de85f73b17" :status="STATUS_MAP[scope.row.status]" :text="OWNER_STATUS_TEXT[scope.row.status]"></status-badge>
+          </template>
+        </TableColumn>
+        <TableColumn prop="modifyTime" label="操作时间" width="200" data-auid="8769b7985d02" :formatter="formatModifierTime"></TableColumn>
+        <TableColumn prop="modifierName" label="操作人" width="200" data-auid="933d4776eeae"></TableColumn>
+        <TableColumn label="操作" width="200" data-auid="7efdfdfad5f2">
+          <template slot-scope="scope">
+            <TablePopoverButton data-auid="038b25f05783" :tip="ACTION_TIP_MAP[scope.row.status]" @click="editOwnerStatus(scope.row)">
+              {{ ACTION_TEXT_MAP[scope.row.status] }}
+            </TablePopoverButton>
+            <TablePopoverButton tip="确认删除该主播吗？" data-auid="fe308d54fa22" @click="deleteOwner(scope.row)">
+              删除
+            </TablePopoverButton>
+          </template>
+        </TableColumn>
+      </Table>
+    </panel-template>
   </div>
 </template>

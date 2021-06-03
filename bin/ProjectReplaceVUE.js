@@ -106,7 +106,7 @@ module.exports = function (_Project) {
         _this2.template = [];
         _this2.curFilepath = filepath;
         _this2.curContent = fs.readFileSync(filepath, {
-          encoding: _this2.info.autoUid.encoding || "utf8"
+          encoding: _this2.info.autoUid.encoding || "utf-8"
         });
 
         _this2.tagInfo = _this2.getTag("template", filepath, 0);

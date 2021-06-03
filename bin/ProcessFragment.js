@@ -39,6 +39,9 @@ var _require3 = require("./adapters"),
     htmlDecode = _require3.htmlDecode,
     completeJsxAttrs = _require3.completeJsxAttrs,
     replaceJsxValue = _require3.replaceJsxValue,
+    readUpperCaseNodeName = _require3.readUpperCaseNodeName,
+    filterUpperCaseStr = _require3.filterUpperCaseStr,
+    revertUpperCaseNodeName = _require3.revertUpperCaseNodeName,
     transformIgnoreTagOrEmptyTag = _require3.transformIgnoreTagOrEmptyTag;
 
 module.exports = function () {
@@ -67,6 +70,8 @@ module.exports = function () {
     value: function registerAdapter() {
       var _this = this;
 
+      // 解析readNodes前拦截
+      this.beforeReadNodesFunc = [filterUpperCaseStr];
       // 解析attrs前的拦截器
       this.beforeAttrsFunc = [completeJsxAttrs, function (val) {
         return transformIgnoreTagOrEmptyTag(_this.ignoretags, val);
@@ -74,9 +79,9 @@ module.exports = function () {
       // 解析attrs完成后的拦截器
       this.afterAttrsFunc = [sortAttrsByLintRule];
       // 解析内容前的拦截器
-      this.beforeProcessFunc = [completeSingleTag];
+      this.beforeProcessFunc = [readUpperCaseNodeName, completeSingleTag];
       // 处理完成后的拦截器
-      this.afterProcessFuns = [deleteIgnoreTagEmptyValue, htmlDecode, revertSingleTag, replaceJsxValue];
+      this.afterProcessFuns = [deleteIgnoreTagEmptyValue, htmlDecode, revertSingleTag, revertUpperCaseNodeName, replaceJsxValue];
     }
   }, {
     key: "adapterObs",
@@ -128,6 +133,7 @@ module.exports = function () {
       if (/(#|#text)/.test(item.nodeName)) {
         return item;
       }
+      item = this.adapterObs(this.beforeReadNodesFunc, item);
       item.attrs = this.adapterObs(this.beforeAttrsFunc, item.attrs);
 
       var fullTagPath = parentPath ? parentPath + "_" + item.nodeName : item.nodeName;

@@ -11,6 +11,9 @@ const {
   htmlDecode,
   completeJsxAttrs,
   replaceJsxValue,
+  readUpperCaseNodeName,
+  filterUpperCaseStr,
+  revertUpperCaseNodeName,
   transformIgnoreTagOrEmptyTag
 } = require("./adapters");
 
@@ -38,6 +41,8 @@ module.exports = class ProcessFragment {
   }
   // 注册拦截器 拦截器内的this会被重定向
   registerAdapter() {
+    // 解析readNodes前拦截
+    this.beforeReadNodesFunc = [filterUpperCaseStr];
     // 解析attrs前的拦截器
     this.beforeAttrsFunc = [
       completeJsxAttrs,
@@ -46,12 +51,13 @@ module.exports = class ProcessFragment {
     // 解析attrs完成后的拦截器
     this.afterAttrsFunc = [sortAttrsByLintRule];
     // 解析内容前的拦截器
-    this.beforeProcessFunc = [completeSingleTag];
+    this.beforeProcessFunc = [readUpperCaseNodeName,completeSingleTag];
     // 处理完成后的拦截器
     this.afterProcessFuns = [
       deleteIgnoreTagEmptyValue,
       htmlDecode,
       revertSingleTag,
+      revertUpperCaseNodeName,
       replaceJsxValue
     ];
   }
@@ -90,6 +96,7 @@ module.exports = class ProcessFragment {
     if (/(#|#text)/.test(item.nodeName)) {
       return item;
     }
+    item = this.adapterObs(this.beforeReadNodesFunc,item);
     item.attrs = this.adapterObs(this.beforeAttrsFunc, item.attrs);
 
     const fullTagPath = parentPath

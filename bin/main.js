@@ -50,6 +50,11 @@ var Run = function () {
       program.full = true;
       program.write = true;
     }
+    if (!program.debug) {
+      logSuc = logInfo = function logInfo(i) {
+        return i;
+      };
+    }
 
     this.PROJECT_ROOT = program.path || PROJECT_ROOT;
 
