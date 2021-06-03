@@ -1,19 +1,49 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var _keys = require("babel-runtime/core-js/object/keys");
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _keys2 = _interopRequireDefault(_keys);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _defineProperty2 = require("babel-runtime/helpers/defineProperty");
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _assign = require("babel-runtime/core-js/object/assign");
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require("babel-runtime/helpers/createClass");
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Uuid = require("uuid/v4");
 var parse5 = require("parse5");
 
-var ProcessFragment = function () {
+var _require = require("./configs"),
+    vueAttrsOrder = _require.vueAttrsOrder;
+
+var _require2 = require("./utils/debug"),
+    logInfo = _require2.logInfo;
+
+var _require3 = require("./adapters"),
+    completeSingleTag = _require3.completeSingleTag,
+    sortAttrsByLintRule = _require3.sortAttrsByLintRule,
+    deleteIgnoreTagEmptyValue = _require3.deleteIgnoreTagEmptyValue,
+    revertSingleTag = _require3.revertSingleTag,
+    htmlDecode = _require3.htmlDecode,
+    completeJsxAttrs = _require3.completeJsxAttrs,
+    replaceJsxValue = _require3.replaceJsxValue,
+    transformIgnoreTagOrEmptyTag = _require3.transformIgnoreTagOrEmptyTag;
+
+module.exports = function () {
   function ProcessFragment(root) {
-    _classCallCheck(this, ProcessFragment);
+    (0, _classCallCheck3.default)(this, ProcessFragment);
 
     this.filename = root.curFilepath.split("/").pop().split(".")[0];
     this.distJson = root.distJson;
@@ -26,19 +56,53 @@ var ProcessFragment = function () {
     this.tempErrorAttrs = {}; //暂存jsx等引起的解析错误
 
     this.uniqIds = {};
+    // adapter
+    this.registerAdapter();
   }
+  // 注册拦截器 拦截器内的this会被重定向
 
-  _createClass(ProcessFragment, [{
+
+  (0, _createClass3.default)(ProcessFragment, [{
+    key: "registerAdapter",
+    value: function registerAdapter() {
+      var _this = this;
+
+      // 解析attrs前的拦截器
+      this.beforeAttrsFunc = [completeJsxAttrs, function (val) {
+        return transformIgnoreTagOrEmptyTag(_this.ignoretags, val);
+      }];
+      // 解析attrs完成后的拦截器
+      this.afterAttrsFunc = [sortAttrsByLintRule];
+      // 解析内容前的拦截器
+      this.beforeProcessFunc = [completeSingleTag];
+      // 处理完成后的拦截器
+      this.afterProcessFuns = [deleteIgnoreTagEmptyValue, htmlDecode, revertSingleTag, replaceJsxValue];
+    }
+  }, {
+    key: "adapterObs",
+    value: function adapterObs(adapters, content) {
+      var _this2 = this;
+
+      return adapters.reduce(function (c, fn) {
+        // const names = fn.toString().match(/function[\s]*([^(]+)/);
+        // if (names.length >= 2) {
+        //   logInfo(`adapters:${names[1]}`)
+        // }
+        return fn.call(_this2, c);
+      }, content);
+    }
+  }, {
     key: "process",
     value: function process(content) {
-      var _this = this;
+      var _this3 = this;
 
       var info = this.info;
       var p = this;
-      var htmlFragmentParse = parse5.parseFragment(this.fixSingleTag(content));
+      var ct = this.adapterObs(this.beforeProcessFunc, content);
+      var htmlFragmentParse = parse5.parseFragment(ct);
       // 遍历处理所有的nodes
       htmlFragmentParse.childNodes = htmlFragmentParse.childNodes.map(function (node, index) {
-        return _this.readNodes({
+        return _this3.readNodes({
           item: node,
           parentPath: null,
           index: index
@@ -49,17 +113,13 @@ var ProcessFragment = function () {
       this.distJson[this.relativeFilePath] = this.generateIds;
       // 处理错误的attrs
       var parse5Content = parse5.serialize(htmlFragmentParse);
-      Object.keys(this.tempErrorAttrs).forEach(function (key) {
-        parse5Content = parse5Content.replace(new RegExp("\"" + key + "\"", "ig"), _this.tempErrorAttrs[key]);
-      });
-      // 替换所有的ignore
-      parse5Content = parse5Content.replace(/=["']__CLEAN__["']/g, "");
-      return parse5Content;
+
+      return this.adapterObs(this.afterProcessFuns, parse5Content);
     }
   }, {
     key: "readNodes",
     value: function readNodes(_ref) {
-      var _this2 = this;
+      var _this4 = this;
 
       var item = _ref.item,
           parentPath = _ref.parentPath,
@@ -68,6 +128,8 @@ var ProcessFragment = function () {
       if (/(#|#text)/.test(item.nodeName)) {
         return item;
       }
+      item.attrs = this.adapterObs(this.beforeAttrsFunc, item.attrs);
+
       var fullTagPath = parentPath ? parentPath + "_" + item.nodeName : item.nodeName;
 
       var childNodes = [];
@@ -79,49 +141,50 @@ var ProcessFragment = function () {
       }
       // 递归处理nodes
       childNodes = childNodes.map(function (subItem, idx) {
-        return _this2.readNodes({
+        return _this4.readNodes({
           item: subItem,
           parentPath: fullTagPath,
           index: idx
         });
       });
 
-      var attrNamesObj = this.processAttrs(item.attrs);
-
+      var attrNamesObj = item.attrs.reduce(function (res, item) {
+        return (0, _assign2.default)(res, (0, _defineProperty3.default)({}, item.name, item.value));
+      }, {});
       var distJsonKey = fullTagPath + "_" + index;
 
       // 读文件配置ID 或dom本身已存在ID
-      var attrValue = this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
-      if (!attrValue || this.program.update) {
+      var autoUidValue = this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
+      if (!autoUidValue || this.program.update) {
         // 更新attr
         if (attrNamesObj.id && this.program.byName) {
-          attrValue = "id#" + (attrNamesObj.id.value || attrNamesObj.id);
+          autoUidValue = "id#" + (attrNamesObj.id.value || attrNamesObj.id);
         } else if (attrNamesObj.class && this.program.byName) {
-          attrValue = "class." + (attrNamesObj.class.value || attrNamesObj.class);
+          autoUidValue = "class." + (attrNamesObj.class.value || attrNamesObj.class);
         } else if (this.program.dom) {
-          attrValue = fullTagPath;
+          autoUidValue = fullTagPath;
         } else {
-          attrValue = Uuid().replace(/-/g, "").slice(0, 12);
+          autoUidValue = Uuid().replace(/-/g, "").slice(0, 12);
         }
       }
-      // attrValue去重
-      if (!/@/g.test(attrValue)) {
-        if (this.uniqIds[attrValue]) {
-          this.uniqIds[attrValue]++;
-          attrValue += "@" + this.uniqIds[attrValue];
+      // autoUidValue去重
+      if (!/@/g.test(autoUidValue)) {
+        if (this.uniqIds[autoUidValue]) {
+          this.uniqIds[autoUidValue]++;
+          autoUidValue += "@" + this.uniqIds[autoUidValue];
         } else {
-          this.uniqIds[attrValue] = 1;
+          this.uniqIds[autoUidValue] = 1;
         }
       }
 
       if (this.autoUid.idprefix) {
-        attrValue = this.info.autoUid.idprefix + attrValue;
+        autoUidValue = this.info.autoUid.idprefix + autoUidValue;
       }
 
-      this.generateIds[distJsonKey] = attrValue;
+      this.generateIds[distJsonKey] = autoUidValue;
       if (this.program.write) {
         // 写入dom
-        attrNamesObj[this.attrname] = attrValue;
+        attrNamesObj[this.attrname] = autoUidValue;
       }
       if (this.program.clean) {
         // 清除生成的id
@@ -132,66 +195,15 @@ var ProcessFragment = function () {
         delete attrNamesObj[this.attrname];
       }
       // 先找到dom中是否存在class或者id
-      item.attrs = Object.keys(attrNamesObj).map(function (name) {
+      var attrs = (0, _keys2.default)(attrNamesObj).map(function (name) {
         return {
           name: name,
           value: attrNamesObj[name]
         };
       });
+      item.attrs = this.adapterObs(this.afterAttrsFunc, attrs);
       return item;
     }
-  }, {
-    key: "processAttrs",
-    value: function processAttrs() {
-      var _this3 = this;
-
-      var attrs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
-      // 过滤jsx特殊的value class={}
-      var jsxValue = void 0,
-          jsxStartIndex = void 0,
-          jsxStartName = void 0;
-      var tempAttrsObj = {};
-      attrs.forEach(function (_ref2, index) {
-        var name = _ref2.name,
-            value = _ref2.value;
-
-        if (/^\{/.test(value)) {
-          // jsx的属性 ={
-          jsxStartIndex = index;
-          jsxStartName = name;
-          jsxValue = value;
-        } else if (/\}$/.test(value) || /\}$/.test(name)) {
-          // jsx的属性 }
-          jsxValue = jsxValue + " " + name + value;
-          var uuidName = Uuid().replace(/-/g, "").slice(0, 12);
-          _this3.tempErrorAttrs[uuidName] = jsxValue;
-          tempAttrsObj[jsxStartName] = uuidName;
-          jsxValue = undefined;
-        } else if (jsxValue) {
-          jsxValue = jsxValue + " " + name + value;
-        } else if (_this3.ignoretags.indexOf(name) !== -1 || value == "") {
-          // 标签在忽视列表中 或为空值 譬如v-else
-          tempAttrsObj[name] = "__CLEAN__";
-        } else {
-          tempAttrsObj[name] = value;
-        }
-      });
-
-      return tempAttrsObj;
-    }
-    // 处理所有的single tag ， 例如 <el-table-column /> 否则parse5会识别失败
-
-  }, {
-    key: "fixSingleTag",
-    value: function fixSingleTag(content) {
-      return content.replace(/<([^ ]+)([^\/>]+)\/>/g, function (text, $1, $2) {
-        return "<" + $1 + $2 + "></" + $1.replace(/\n/, "") + ">";
-      });
-    }
   }]);
-
   return ProcessFragment;
 }();
-
-exports.default = ProcessFragment;

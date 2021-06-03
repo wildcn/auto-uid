@@ -1,7 +1,20 @@
 const Uuid = require("uuid/v4");
 const parse5 = require("parse5");
+const { vueAttrsOrder } = require("./configs");
+const { logInfo } = require("./utils/debug");
 
-export default class ProcessFragment {
+const {
+  completeSingleTag,
+  sortAttrsByLintRule,
+  deleteIgnoreTagEmptyValue,
+  revertSingleTag,
+  htmlDecode,
+  completeJsxAttrs,
+  replaceJsxValue,
+  transformIgnoreTagOrEmptyTag
+} = require("./adapters");
+
+module.exports = class ProcessFragment {
   constructor(root) {
     this.filename = root.curFilepath
       .split("/")
@@ -20,11 +33,42 @@ export default class ProcessFragment {
     this.tempErrorAttrs = {}; //暂存jsx等引起的解析错误
 
     this.uniqIds = {};
+    // adapter
+    this.registerAdapter();
+  }
+  // 注册拦截器 拦截器内的this会被重定向
+  registerAdapter() {
+    // 解析attrs前的拦截器
+    this.beforeAttrsFunc = [
+      completeJsxAttrs,
+      val => transformIgnoreTagOrEmptyTag(this.ignoretags, val)
+    ];
+    // 解析attrs完成后的拦截器
+    this.afterAttrsFunc = [sortAttrsByLintRule];
+    // 解析内容前的拦截器
+    this.beforeProcessFunc = [completeSingleTag];
+    // 处理完成后的拦截器
+    this.afterProcessFuns = [
+      deleteIgnoreTagEmptyValue,
+      htmlDecode,
+      revertSingleTag,
+      replaceJsxValue
+    ];
+  }
+  adapterObs(adapters, content) {
+    return adapters.reduce((c, fn) => {
+      // const names = fn.toString().match(/function[\s]*([^(]+)/);
+      // if (names.length >= 2) {
+      //   logInfo(`adapters:${names[1]}`)
+      // }
+      return fn.call(this, c);
+    }, content);
   }
   process(content) {
     let info = this.info;
     let p = this;
-    let htmlFragmentParse = parse5.parseFragment(this.fixSingleTag(content));
+    let ct = this.adapterObs(this.beforeProcessFunc, content);
+    let htmlFragmentParse = parse5.parseFragment(ct);
     // 遍历处理所有的nodes
     htmlFragmentParse.childNodes = htmlFragmentParse.childNodes.map(
       (node, index) =>
@@ -39,21 +83,15 @@ export default class ProcessFragment {
     this.distJson[this.relativeFilePath] = this.generateIds;
     // 处理错误的attrs
     let parse5Content = parse5.serialize(htmlFragmentParse);
-    Object.keys(this.tempErrorAttrs).forEach(key => {
-      parse5Content = parse5Content.replace(
-        new RegExp(`"${key}"`, "ig"),
-        this.tempErrorAttrs[key]
-      );
-    });
-    // 替换所有的ignore
-    parse5Content = parse5Content.replace(/=["']__CLEAN__["']/g, "");
-    return parse5Content;
-  }
 
+    return this.adapterObs(this.afterProcessFuns, parse5Content);
+  }
   readNodes({ item, parentPath, index }) {
     if (/(#|#text)/.test(item.nodeName)) {
       return item;
     }
+    item.attrs = this.adapterObs(this.beforeAttrsFunc, item.attrs);
+
     const fullTagPath = parentPath
       ? `${parentPath}_${item.nodeName}`
       : item.nodeName;
@@ -78,45 +116,48 @@ export default class ProcessFragment {
       })
     );
 
-    let attrNamesObj = this.processAttrs(item.attrs);
-
+    let attrNamesObj = item.attrs.reduce(
+      (res, item) => Object.assign(res, { [item.name]: item.value }),
+      {}
+    );
     let distJsonKey = `${fullTagPath}_${index}`;
 
     // 读文件配置ID 或dom本身已存在ID
-    let attrValue =
+    let autoUidValue =
       this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
-    if (!attrValue || this.program.update) {
+    if (!autoUidValue || this.program.update) {
       // 更新attr
       if (attrNamesObj.id && this.program.byName) {
-        attrValue = `id#${attrNamesObj.id.value || attrNamesObj.id}`;
+        autoUidValue = `id#${attrNamesObj.id.value || attrNamesObj.id}`;
       } else if (attrNamesObj.class && this.program.byName) {
-        attrValue = `class.${attrNamesObj.class.value || attrNamesObj.class}`;
+        autoUidValue = `class.${attrNamesObj.class.value ||
+          attrNamesObj.class}`;
       } else if (this.program.dom) {
-        attrValue = fullTagPath;
+        autoUidValue = fullTagPath;
       } else {
-        attrValue = Uuid()
+        autoUidValue = Uuid()
           .replace(/-/g, "")
           .slice(0, 12);
       }
     }
-    // attrValue去重
-    if (!/@/g.test(attrValue)) {
-      if (this.uniqIds[attrValue]) {
-        this.uniqIds[attrValue]++;
-        attrValue += `@${this.uniqIds[attrValue]}`;
+    // autoUidValue去重
+    if (!/@/g.test(autoUidValue)) {
+      if (this.uniqIds[autoUidValue]) {
+        this.uniqIds[autoUidValue]++;
+        autoUidValue += `@${this.uniqIds[autoUidValue]}`;
       } else {
-        this.uniqIds[attrValue] = 1;
+        this.uniqIds[autoUidValue] = 1;
       }
     }
 
     if (this.autoUid.idprefix) {
-      attrValue = this.info.autoUid.idprefix + attrValue;
+      autoUidValue = this.info.autoUid.idprefix + autoUidValue;
     }
 
-    this.generateIds[distJsonKey] = attrValue;
+    this.generateIds[distJsonKey] = autoUidValue;
     if (this.program.write) {
       // 写入dom
-      attrNamesObj[this.attrname] = attrValue;
+      attrNamesObj[this.attrname] = autoUidValue;
     }
     if (this.program.clean) {
       // 清除生成的id
@@ -127,47 +168,11 @@ export default class ProcessFragment {
       delete attrNamesObj[this.attrname];
     }
     // 先找到dom中是否存在class或者id
-    item.attrs = Object.keys(attrNamesObj).map(name => ({
+    let attrs = Object.keys(attrNamesObj).map(name => ({
       name,
       value: attrNamesObj[name]
     }));
+    item.attrs = this.adapterObs(this.afterAttrsFunc, attrs);
     return item;
   }
-  processAttrs(attrs = []) {
-    // 过滤jsx特殊的value class={}
-    let jsxValue, jsxStartIndex, jsxStartName;
-    let tempAttrsObj = {};
-    attrs.forEach(({ name, value }, index) => {
-      if (/^\{/.test(value)) {
-        // jsx的属性 ={
-        jsxStartIndex = index;
-        jsxStartName = name;
-        jsxValue = value;
-      } else if (/\}$/.test(value) || /\}$/.test(name)) {
-        // jsx的属性 }
-        jsxValue = jsxValue + " " + name + value;
-        let uuidName = Uuid()
-          .replace(/-/g, "")
-          .slice(0, 12);
-        this.tempErrorAttrs[uuidName] = jsxValue;
-        tempAttrsObj[jsxStartName] = uuidName;
-        jsxValue = undefined;
-      } else if (jsxValue) {
-        jsxValue = jsxValue + " " + name + value;
-      } else if (this.ignoretags.indexOf(name) !== -1 || value == "") {
-        // 标签在忽视列表中 或为空值 譬如v-else
-        tempAttrsObj[name] = "__CLEAN__";
-      } else {
-        tempAttrsObj[name] = value;
-      }
-    });
-
-    return tempAttrsObj;
-  }
-  // 处理所有的single tag ， 例如 <el-table-column /> 否则parse5会识别失败
-  fixSingleTag(content) {
-    return content.replace(/<([^ ]+)([^\/>]+)\/>/g, function(text, $1, $2) {
-      return `<${$1}${$2}></${$1.replace(/\n/, "")}>`;
-    });
-  }
-}
+};

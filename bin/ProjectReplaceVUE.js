@@ -1,129 +1,114 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var _stringify = require("babel-runtime/core-js/json/stringify");
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _stringify2 = _interopRequireDefault(_stringify);
 
-var _fsExtra = require("fs-extra");
+var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
 
-var _fsExtra2 = _interopRequireDefault(_fsExtra);
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
 
-var _path = require("path");
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
-var _path2 = _interopRequireDefault(_path);
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _chalk = require("chalk");
+var _createClass2 = require("babel-runtime/helpers/createClass");
 
-var _chalk2 = _interopRequireDefault(_chalk);
+var _createClass3 = _interopRequireDefault(_createClass2);
 
-var _clear = require("clear");
+var _possibleConstructorReturn2 = require("babel-runtime/helpers/possibleConstructorReturn");
 
-var _clear2 = _interopRequireDefault(_clear);
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
 
-var _Project2 = require("./Project.js");
+var _inherits2 = require("babel-runtime/helpers/inherits");
 
-var _Project3 = _interopRequireDefault(_Project2);
+var _inherits3 = _interopRequireDefault(_inherits2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 require("./utils/polyfile.js");
+var fs = require("fs-extra");
+var path = require("path");
 
+var _require = require("./utils/debug"),
+    logSuc = _require.logSuc,
+    logErr = _require.logErr,
+    logInfo = _require.logInfo,
+    logWar = _require.logWar;
 
-var shell = require("shelljs");
-var glob = require("glob");
-var Uuid = require("uuid/v4");
+var ProcessFragment = require("./ProcessFragment");
 
-var error = _chalk2.default.bold.red;
-var warning = _chalk2.default.keyword("orange");
-var success = _chalk2.default.greenBright;
-var info = _chalk2.default.bold.blue;
+var Project = require("./Project.js");
 
-var ProcessFragment = require("./ProcessFragment").default;
-
-var ProjectReplaceVUE = function (_Project) {
-  _inherits(ProjectReplaceVUE, _Project);
+module.exports = function (_Project) {
+  (0, _inherits3.default)(ProjectReplaceVUE, _Project);
 
   function ProjectReplaceVUE(app) {
-    _classCallCheck(this, ProjectReplaceVUE);
+    (0, _classCallCheck3.default)(this, ProjectReplaceVUE);
 
-    return _possibleConstructorReturn(this, (ProjectReplaceVUE.__proto__ || Object.getPrototypeOf(ProjectReplaceVUE)).call(this, app));
+    var _this = (0, _possibleConstructorReturn3.default)(this, (ProjectReplaceVUE.__proto__ || (0, _getPrototypeOf2.default)(ProjectReplaceVUE)).call(this, app));
+
+    _this.app = app;
+    _this.tempErrorAttrs = {}; // 支持jsx的错误parse，和v-else等空attrs
+    _this.attrname = _this.info.autoUid.attrname;
+    _this.distJson = {};
+    _this.distAddr = path.resolve(_this.info.projectRoot, _this.info.autoUid.dist);
+    _this.realChangeFiles = [];
+    _this.readDistJson();
+    if (_this.app.autoCommnad) {
+      logInfo("auto Command model!");
+      _this.init();
+    }
+    return _this;
   }
 
-  _createClass(ProjectReplaceVUE, [{
+  (0, _createClass3.default)(ProjectReplaceVUE, [{
     key: "init",
     value: function init() {
-      this.gcount = 1;
-      this.idmap = {};
-
-      //console.log( this.info );
-      this.delimiter = "|||||";
-      this.pattern = "{delimiter}{count}{delimiter}{content}{delimiter}";
-      //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
-      this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
-
-      this.attrnameRe = new RegExp(this.info.autoUid.attrname + "[\\s]*?\\=", "i");
-      this.fixEmptyRe = new RegExp("(" + this.info.autoUid.attrname + "[\\s]*?\\=)('|\")([\\s]*)?\\2", "ig");
-      this.fixRepeatRe = new RegExp("(" + this.info.autoUid.attrname + "[\\s]*?\\=)('|\")([a-z0-9\\-\\_]*)?\\2", "ig");
-      this.firstSpaceRe = /^([\s]|>)/;
-      this.lastSpaceRe = /[\s]$/;
-      this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
-
-      this.tempErrorAttrs = {}; // 支持jsx的错误parse，和v-else等空attrs
-      this.attrname = this.info.autoUid.attrname;
-
-      if (this.info.autoUid.ignoretag && this.info.autoUid.ignoretag.length) {
-        //this.info.autoUid.ignoretag.remove( 'template' );
-        this.ignoreTagRe = new RegExp("^<(" + this.info.autoUid.ignoretag.join("|") + ")\\b", "i");
-      }
-
       this.getChangeFiles();
-
+      // 自动处理
+      this.process();
+    }
+  }, {
+    key: "readDistJson",
+    value: function readDistJson() {
+      logInfo("readDistJson");
       // 读取dist配置
-      this.distJson = {};
-      var dist = _path2.default.resolve(this.info.projectRoot, this.info.autoUid.dist);
-      if (_fsExtra2.default.existsSync(dist)) {
-        var distFileContent = _fsExtra2.default.readFileSync(dist, {
+      if (fs.existsSync(this.distAddr)) {
+        var distFileContent = fs.readFileSync(this.distAddr, {
           encoding: "utf-8"
         });
         if (distFileContent) {
           try {
             this.distJson = JSON.parse(distFileContent);
           } catch (err) {
-            warning(err);
+            logWar(err);
           }
         }
       }
-      this.process();
-      _fsExtra2.default.writeFileSync(dist, JSON.stringify(this.distJson, null, 2), {
-        encoding: "utf-8"
-      });
+      this.distJsonCache = (0, _stringify2.default)(this.distJson);
     }
   }, {
     key: "process",
     value: function process() {
       var _this2 = this;
 
+      logInfo("ProjectVue process");
       var p = this;
-
-      this.allFile.map(function (filepath, index) {
+      if (this.changeFiles.length === 0) {
+        this.getChangeFiles();
+      }
+      if (this.changeFiles.length === 0) {
+        logErr("no changeFiles read, please check auto-uid.config.js or new (options)");
+      }
+      this.changeFiles.map(function (filepath, index) {
         _this2.tag = {};
         _this2.template = [];
-        _this2.curCount = 0;
         _this2.curFilepath = filepath;
-
-        _this2.curContent = _fsExtra2.default.readFileSync(filepath, {
+        _this2.curContent = fs.readFileSync(filepath, {
           encoding: _this2.info.autoUid.encoding || "utf8"
         });
 
-        //let tagInfo = this.getTag( 'div', filepath, 1 );
         _this2.tagInfo = _this2.getTag("template", filepath, 0);
 
         _this2.tagInfo.data.map(function (item) {
@@ -133,15 +118,20 @@ var ProjectReplaceVUE = function (_Project) {
         });
 
         if (_this2.tagInfo.content != _this2.tagInfo.newContent) {
-          console.log(success("[auto-uid] update file:"), success(filepath));
-          _fsExtra2.default.writeFileSync(filepath, _this2.tagInfo.newContent, {
+          logSuc("update file," + filepath);
+          fs.writeFileSync(filepath, _this2.tagInfo.newContent, {
             encoding: _this2.info.autoUid.encoding || "utf8"
           });
-          // shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
-          //   silent: true
-          // });
+          _this2.realChangeFiles.push(filepath);
         }
       });
+      if ((0, _stringify2.default)(this.distJson) !== this.distJsonCache) {
+        // 配置发生变更，写入配置
+        fs.writeFileSync(this.distAddr, (0, _stringify2.default)(this.distJson, null, 2), {
+          encoding: "utf-8"
+        });
+        logSuc("dist.json changed,rewrite!");
+      }
     }
   }, {
     key: "getTag",
@@ -173,11 +163,6 @@ var ProjectReplaceVUE = function (_Project) {
 
         var endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
         var endIndex = endResult.end;
-
-        /*
-          console.log( curIndex + tmp.index, endIndex );
-          console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
-          */
 
         if (endIndex) {
           var data = {
@@ -224,8 +209,5 @@ var ProjectReplaceVUE = function (_Project) {
       return r;
     }
   }]);
-
   return ProjectReplaceVUE;
-}(_Project3.default);
-
-exports.default = ProjectReplaceVUE;
+}(Project);

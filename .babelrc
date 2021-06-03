@@ -1,3 +1,8 @@
 {
-  "presets": ["env"]
+  "presets": [
+    "latest"
+  ],
+  "plugins": [
+    "transform-runtime"
+  ]
 }

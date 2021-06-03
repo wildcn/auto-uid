@@ -1,102 +1,70 @@
 require("./utils/polyfile.js");
-import fs from "fs-extra";
-import path from "path";
+const fs = require("fs-extra");
+const path = require("path");
 
-import chalk from "chalk";
-import clear from "clear";
+const { logSuc, logErr, logInfo, logWar } = require("./utils/debug");
 
-const shell = require("shelljs");
-const glob = require("glob");
-const Uuid = require("uuid/v4");
+const ProcessFragment = require("./ProcessFragment");
 
-const error = chalk.bold.red;
-const warning = chalk.keyword("orange");
-const success = chalk.greenBright;
-const info = chalk.bold.blue;
+const Project = require("./Project.js");
 
-const ProcessFragment = require("./ProcessFragment").default;
-
-import Project from "./Project.js";
-
-export default class ProjectReplaceVUE extends Project {
+module.exports = class ProjectReplaceVUE extends Project {
   constructor(app) {
     super(app);
+    this.app = app;
+    this.tempErrorAttrs = {}; // 支持jsx的错误parse，和v-else等空attrs
+    this.attrname = this.info.autoUid.attrname;
+    this.distJson = {};
+    this.distAddr = path.resolve(this.info.projectRoot, this.info.autoUid.dist);
+    this.realChangeFiles = [];
+    this.readDistJson();
+    if (this.app.autoCommnad) {
+      logInfo("auto Command model!");
+      this.init();
+    }
   }
 
   init() {
-    this.gcount = 1;
-    this.idmap = {};
-
-    //console.log( this.info );
-    this.delimiter = "|||||";
-    this.pattern = "{delimiter}{count}{delimiter}{content}{delimiter}";
-    //this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?>)/gi;
-    this.tagContentRe = /(<[a-z][a-z0-9\-]*)([^<>]*?)(\/>|>)/gi;
-
-    this.attrnameRe = new RegExp(
-      `${this.info.autoUid.attrname}[\\s]*?\\=`,
-      "i"
-    );
-    this.fixEmptyRe = new RegExp(
-      `(${this.info.autoUid.attrname}[\\s]*?\\=)('|")([\\s]*)?\\2`,
-      "ig"
-    );
-    this.fixRepeatRe = new RegExp(
-      `(${this.info.autoUid.attrname}[\\s]*?\\=)('|")([a-z0-9\\-\\_]*)?\\2`,
-      "ig"
-    );
-    this.firstSpaceRe = /^([\s]|>)/;
-    this.lastSpaceRe = /[\s]$/;
-    this.equalContentRe = /(\=[\s]*?)('|")([^\2]*?)\2/g;
-
-    this.tempErrorAttrs = {}; // 支持jsx的错误parse，和v-else等空attrs
-    this.attrname = this.info.autoUid.attrname;
-
-    if (this.info.autoUid.ignoretag && this.info.autoUid.ignoretag.length) {
-      //this.info.autoUid.ignoretag.remove( 'template' );
-      this.ignoreTagRe = new RegExp(
-        `^<(${this.info.autoUid.ignoretag.join("|")})\\b`,
-        "i"
-      );
-    }
-
     this.getChangeFiles();
-
+    // 自动处理
+    this.process();
+  }
+  readDistJson() {
+    logInfo("readDistJson");
     // 读取dist配置
-    this.distJson = {};
-    let dist = path.resolve(this.info.projectRoot, this.info.autoUid.dist);
-    if (fs.existsSync(dist)) {
-      let distFileContent = fs.readFileSync(dist, {
+    if (fs.existsSync(this.distAddr)) {
+      let distFileContent = fs.readFileSync(this.distAddr, {
         encoding: "utf-8"
       });
       if (distFileContent) {
         try {
           this.distJson = JSON.parse(distFileContent);
         } catch (err) {
-          warning(err);
+          logWar(err);
         }
       }
     }
-    this.process();
-    fs.writeFileSync(dist, JSON.stringify(this.distJson, null, 2), {
-      encoding: "utf-8"
-    });
+    this.distJsonCache = JSON.stringify(this.distJson);
   }
-
   process() {
+    logInfo("ProjectVue process");
     let p = this;
-
-    this.allFile.map((filepath, index) => {
+    if (this.changeFiles.length === 0) {
+      this.getChangeFiles();
+    }
+    if (this.changeFiles.length === 0) {
+      logErr(
+        `no changeFiles read, please check auto-uid.config.js or new (options)`
+      );
+    }
+    this.changeFiles.map((filepath, index) => {
       this.tag = {};
       this.template = [];
-      this.curCount = 0;
       this.curFilepath = filepath;
-
       this.curContent = fs.readFileSync(filepath, {
         encoding: this.info.autoUid.encoding || "utf8"
       });
 
-      //let tagInfo = this.getTag( 'div', filepath, 1 );
       this.tagInfo = this.getTag("template", filepath, 0);
 
       this.tagInfo.data.map(item => {
@@ -113,15 +81,20 @@ export default class ProjectReplaceVUE extends Project {
       });
 
       if (this.tagInfo.content != this.tagInfo.newContent) {
-        console.log(success("[auto-uid] update file:"), success(filepath));
+        logSuc(`update file,${filepath}`);
         fs.writeFileSync(filepath, this.tagInfo.newContent, {
           encoding: this.info.autoUid.encoding || "utf8"
         });
-        // shell.exec(`cd '${this.info.projectRoot}' && git add ${filepath}`, {
-        //   silent: true
-        // });
+        this.realChangeFiles.push(filepath);
       }
     });
+    if (JSON.stringify(this.distJson) !== this.distJsonCache) {
+      // 配置发生变更，写入配置
+      fs.writeFileSync(this.distAddr, JSON.stringify(this.distJson, null, 2), {
+        encoding: "utf-8"
+      });
+      logSuc(`dist.json changed,rewrite!`);
+    }
   }
 
   getTag(tag, filepath, matchAll = false) {
@@ -150,11 +123,6 @@ export default class ProjectReplaceVUE extends Project {
 
       let endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
       let endIndex = endResult.end;
-
-      /*
-        console.log( curIndex + tmp.index, endIndex );
-        console.log( this.curContent.slice( curIndex + tmp.index, endIndex ) );
-        */
 
       if (endIndex) {
         let data = {
@@ -209,4 +177,4 @@ export default class ProjectReplaceVUE extends Project {
 
     return r;
   }
-}
+};

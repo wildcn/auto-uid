@@ -1,7 +1,7 @@
 let result = {
   extension: ["vue"],
   language: "vue",
-  dir: ["src"],
+  dir: ["src","test"],
   dist: "auto-uid.dist.json",
   encoding: "utf8",
   attrname: "data-auid",
