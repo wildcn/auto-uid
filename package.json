@@ -1,6 +1,6 @@
 {
   "name": "auto-uid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "frontend unique id",
   "main": "bin/main.js",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "babel-node src/main.js -t test/t5.vue -W",
-    "only-test":"babel-node src/main.js",
+    "only-test": "babel-node src/main.js",
     "test-import": "babel-node test/index.js",
     "clean": "babel-node src/main.js -c",
     "node-test": "auto-uid --auto",
