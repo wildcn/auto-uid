@@ -1,9 +1,0 @@
-<template>
-  <div class="components-container" data-auid="cb5e9fb849ea">
-    <aside data-auid="2ac8722de84a">
-      Rich text is a core feature of the management backend, but at the same time it is a place with lots of pits. In the process of selecting rich texts, I also took a lot of detours. The common rich texts on the market have been basically used, and I finally chose Tinymce. See the more detailed rich text comparison and introduction.
-      <a class="link-type" data-auid="d5ff8f155aef" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html" /></aside><a class="link-type" data-auid="d5ff8f155aef@2" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html">
-    <div data-auid="de573ab8cf97">
-      <tinymce v-model="content" data-auid="2f2718c9b099" :height="300" /></div></a></div><a class="link-type" data-auid="d5ff8f155aef@3" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html" /><a class="link-type" data-auid="d5ff8f155aef@3" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html" /><div class="editor-content" data-auid="352a412bba93" v-html="content"><a class="link-type" data-auid="d5ff8f155aef@3" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html"></a><a class="link-type" data-auid="d5ff8f155aef@3" target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/feature/component/rich-editor.html" />
-  
-  </div></template>

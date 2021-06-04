@@ -29,6 +29,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 require("./utils/polyfile.js");
 var fs = require("fs-extra");
 var path = require("path");
+var Uuid = require("uuid/v4");
 
 var _require = require("./utils/debug"),
     logSuc = _require.logSuc,
@@ -109,12 +110,13 @@ module.exports = function (_Project) {
           encoding: _this2.info.autoUid.encoding || "utf-8"
         });
 
-        _this2.tagInfo = _this2.getTag("template", filepath, 0);
+        // this.tagInfo = this.getTag("template", filepath, 0);
+        _this2.tagInfo = _this2.searilizeTag("template", filepath);
 
         _this2.tagInfo.data.map(function (item) {
-          var content = new ProcessFragment(_this2).process(item.innerTag.tagContent, filepath);
+          var content = new ProcessFragment(_this2).process(item.content, filepath);
 
-          _this2.tagInfo.newContent = [_this2.tagInfo.newContent.slice(0, item.innerTag.start), content, _this2.tagInfo.newContent.slice(item.innerTag.end)].join("");
+          _this2.tagInfo.newContent = [_this2.tagInfo.newContent.slice(0, item.start), content, _this2.tagInfo.newContent.slice(item.end)].join("");
         });
 
         if (_this2.tagInfo.content != _this2.tagInfo.newContent) {
@@ -133,80 +135,80 @@ module.exports = function (_Project) {
         logSuc("dist.json changed,rewrite!");
       }
     }
-  }, {
-    key: "getTag",
-    value: function getTag(tag, filepath) {
-      var matchAll = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    /**
+     * 按照tag解析字符串
+     * @param {String} tag 匹配字符串
+     * @param {String} filepath 文件路径
+     * @param {Boolean} nesting 是否拆解嵌套匹配的内容
+     */
 
-      var curIndex = 0;
+  }, {
+    key: "searilizeTag",
+    value: function searilizeTag(tag, filepath) {
+      var nesting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      var startReg = new RegExp("<" + tag + "[^<\\/]*?>", "ig");
+      var endRe = new RegExp("<\\/" + tag + ">", "ig");
+      this.tempContent = this.curContent;
+      // 返回的数据
       var result = {
         content: this.curContent,
         newContent: this.curContent,
-        data: [],
-        filepath: filepath
+        filepath: filepath,
+        data: [] // 匹配到的所有数据 {start,end,content}
       };
+      var curContent = this.curContent;
 
-      var startReg = new RegExp("<" + tag + "[^<\\/]*?>", "i");
-      var endRe = new RegExp("<\\/" + tag + ">", "i");
-
-      while (true) {
-        var tmpContent = this.curContent.slice(curIndex);
-        var tmp = tmpContent.match(startReg);
-
-        if (!tmp) {
-          break;
-        }
-
-        //console.log( this.curFilepath );
-
-        var nextIndex = curIndex + tmp.index + 1;
-
-        var endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
-        var endIndex = endResult.end;
-
-        if (endIndex) {
-          var data = {
-            fullTag: {
-              start: curIndex + tmp.index,
-              end: endIndex,
-              tagContent: this.curContent.slice(curIndex + tmp.index, endIndex)
-            },
-            innerTag: {
-              start: curIndex + tmp.index + tmp[0].length,
-              end: endResult.start
-            }
-          };
-          data.innerTag.tagContent = this.curContent.slice(data.innerTag.start, data.innerTag.end);
-          result.data.unshift(data);
-        }
-
-        curIndex = nextIndex;
-        if (!matchAll) {
-          break;
-        }
+      // 配置tag的位置
+      var startMatch = startReg.exec(curContent);
+      var endMatch = endRe.exec(curContent);
+      var matchIndexs = []; // tag的位置信息
+      while (startMatch) {
+        matchIndexs.push({
+          type: "start",
+          end: startReg.lastIndex,
+          start: startMatch.index
+        });
+        startMatch = startReg.exec(curContent);
       }
-      return result;
-    }
-  }, {
-    key: "matchEnd",
-    value: function matchEnd(nextIndex, startReg, endReg, tagLength) {
-      var r = { start: 0, end: 0 };
+      while (endMatch) {
+        matchIndexs.push({
+          type: "end",
+          end: endRe.lastIndex,
+          start: endMatch.index
+        });
+        endMatch = endRe.exec(curContent);
+      }
+      matchIndexs.sort(function (a, b) {
+        return a.start - b.start;
+      });
 
-      var endContent = this.curContent.slice(nextIndex);
-      var tmpEnd = endContent.match(endReg);
+      // 获取所有匹配tag的数据
+      var tempStack = [];
 
-      if (tmpEnd) {
-        var endMatch = this.curContent.slice(nextIndex, nextIndex + tmpEnd.index + tmpEnd[0].length);
-        var tmpMatch = endMatch.match(startReg);
-        if (tmpMatch) {
-          r = this.matchEnd(nextIndex + tmpEnd.index + tagLength, startReg, endReg, tmpEnd[0].length);
+      matchIndexs.forEach(function (curEndInfo) {
+        if (curEndInfo.type === "start") {
+          tempStack.push(curEndInfo);
         } else {
-          r.start = nextIndex + tmpEnd.index;
-          r.end = nextIndex + tmpEnd.index + tmpEnd[0].length;
-        }
-      }
+          // 碰到end 队列中最后的start出列
+          var curStartInfo = tempStack.pop();
+          if (tempStack.length === 0 || nesting) {
+            // 匹配到的根tag
+            var start = curStartInfo.start;
+            var end = curEndInfo.end;
 
-      return r;
+
+            var content = curContent.slice(start, end);
+            result.data.unshift({
+              start: start,
+              end: end,
+              content: content
+            });
+          }
+        }
+      });
+
+      return result;
     }
   }]);
   return ProjectReplaceVUE;

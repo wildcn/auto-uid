@@ -17,7 +17,7 @@ var _require2 = require("./utils/str"),
 var adapter = {
   tempErrorAttrs: {}, //暂存jsx等引起的解析错误
   upperCaseStrObj: {}, // 暂存所有的驼峰字符串
-
+  perAttrNameReg: "</ \n\r:@",
   // 根据vue eslit 规则为attr排序
   sortAttrsByLintRule: function sortAttrsByLintRule(attrs) {
     // eslint vue/attributes-order  https://eslint.vuejs.org/rules/attributes-order.html
@@ -46,14 +46,18 @@ var adapter = {
 
   // parse5 会将所有的驼峰转换为小写，所以需要先暂存驼峰
   readUpperCaseNodeName: function readUpperCaseNodeName(str) {
-    return str.replace(/<[\/]*([a-zA-Z-]+)/g, function (matchStr, $1) {
+    var _this = this;
+
+    return str.replace(new RegExp("[" + adapter.perAttrNameReg + "]+([a-zA-Z-]+)", "g"), function (matchStr, $1) {
       if (hasCapital($1)) {
         var key = $1.toLowerCase();
         // parse5遇见table会解析错误
         if (["table", "input"].indexOf(key) !== "-1") {
           key = "div-" + key;
         }
-        adapter.upperCaseStrObj[key] = $1;
+        // adapter.upperCaseStrObj[key] = $1;
+        adapter.upperCaseStrObj[_this.relativeFilePath] = adapter.upperCaseStrObj[_this.relativeFilePath] || {};
+        adapter.upperCaseStrObj[_this.relativeFilePath][key] = $1;
         return matchStr.replace($1, key);
       }
       return matchStr;
@@ -63,15 +67,20 @@ var adapter = {
     var nodeName = node.nodeName;
     // 删除不存在的nodeName Uppercase Cache
 
-    if (!adapter.upperCaseStrObj[nodeName]) {
-      delete adapter.upperCaseStrObj[nodeName];
+    if (!adapter.upperCaseStrObj[this.relativeFilePath][nodeName]) {
+      delete adapter.upperCaseStrObj[this.relativeFilePath][nodeName];
     }
     return node;
   },
-  revertUpperCaseNodeName: function revertUpperCaseNodeName(str) {
-    (0, _keys2.default)(adapter.upperCaseStrObj).forEach(function (lowerNodeName) {
-      str = str.replace(new RegExp("(<[/]*)(" + lowerNodeName + ")([ >])", "g"), function (matchStr, $1, $2, $3) {
-        return "" + $1 + adapter.upperCaseStrObj[lowerNodeName] + $3;
+  revertUpperCase: function revertUpperCase(str) {
+    var obj = adapter.upperCaseStrObj[this.relativeFilePath] || {};
+    // lang string first
+    var keys = (0, _keys2.default)(obj).sort(function (a, b) {
+      return b.length - a.length;
+    });
+    keys.forEach(function (lowerNodeName) {
+      str = str.replace(new RegExp("([" + adapter.perAttrNameReg + "]+)(" + lowerNodeName + ")([ >]*)", "g"), function (matchStr, $1, $2, $3) {
+        return "" + $1 + obj[lowerNodeName] + $3;
       });
     });
     return str;

@@ -37,7 +37,7 @@ Program.version(packJSON.version)
   .option("-c, --clean", "清除已有的ID");
 
 Program.parse(process.argv);
-
+logInfo('version :',packJSON.version);
 class Run {
   constructor(program = {}) {
     this.autoCommnad = typeof program.Command !== "undefined";

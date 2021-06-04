@@ -7,7 +7,7 @@ let result = {
   attrname: "data-auid",
   fixempty: true,
   fixrepeat: true,
-  idprefix: "",
+  idprefix: "auid-",
   ignoretag: ["v-hover", "template", "el-table-column","v-else"]
 };
 

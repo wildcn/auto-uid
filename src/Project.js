@@ -34,7 +34,6 @@ module.exports = class Project {
     }
 
     if (program.target) {
-      console.log(program.target);
       p.changeFiles.push(path.resolve(program.target));
     }
     return p.changeFiles;

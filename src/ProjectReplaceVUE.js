@@ -1,6 +1,7 @@
 require("./utils/polyfile.js");
 const fs = require("fs-extra");
 const path = require("path");
+const Uuid = require("uuid/v4");
 
 const { logSuc, logErr, logInfo, logWar } = require("./utils/debug");
 
@@ -65,18 +66,19 @@ module.exports = class ProjectReplaceVUE extends Project {
         encoding: this.info.autoUid.encoding || "utf-8"
       });
 
-      this.tagInfo = this.getTag("template", filepath, 0);
+      // this.tagInfo = this.getTag("template", filepath, 0);
+      this.tagInfo = this.searilizeTag("template", filepath);
 
       this.tagInfo.data.map(item => {
         let content = new ProcessFragment(this).process(
-          item.innerTag.tagContent,
+          item.content,
           filepath
         );
 
         this.tagInfo.newContent = [
-          this.tagInfo.newContent.slice(0, item.innerTag.start),
+          this.tagInfo.newContent.slice(0, item.start),
           content,
-          this.tagInfo.newContent.slice(item.innerTag.end)
+          this.tagInfo.newContent.slice(item.end)
         ].join("");
       });
 
@@ -96,85 +98,71 @@ module.exports = class ProjectReplaceVUE extends Project {
       logSuc(`dist.json changed,rewrite!`);
     }
   }
-
-  getTag(tag, filepath, matchAll = false) {
-    let curIndex = 0;
+  /**
+   * 按照tag解析字符串
+   * @param {String} tag 匹配字符串
+   * @param {String} filepath 文件路径
+   * @param {Boolean} nesting 是否拆解嵌套匹配的内容
+   */
+  searilizeTag(tag, filepath, nesting = false) {
+    let startReg = new RegExp(`<${tag}[^<\\/]*?>`, "ig");
+    let endRe = new RegExp(`<\\/${tag}>`, "ig");
+    this.tempContent = this.curContent;
+    // 返回的数据
     let result = {
       content: this.curContent,
       newContent: this.curContent,
-      data: [],
-      filepath: filepath
+      filepath,
+      data: [] // 匹配到的所有数据 {start,end,content}
     };
+    const curContent = this.curContent;
 
-    let startReg = new RegExp(`<${tag}[^<\\/]*?>`, "i");
-    let endRe = new RegExp(`<\\/${tag}>`, "i");
-
-    while (true) {
-      let tmpContent = this.curContent.slice(curIndex);
-      let tmp = tmpContent.match(startReg);
-
-      if (!tmp) {
-        break;
-      }
-
-      //console.log( this.curFilepath );
-
-      let nextIndex = curIndex + tmp.index + 1;
-
-      let endResult = this.matchEnd(nextIndex, startReg, endRe, tag.length + 3);
-      let endIndex = endResult.end;
-
-      if (endIndex) {
-        let data = {
-          fullTag: {
-            start: curIndex + tmp.index,
-            end: endIndex,
-            tagContent: this.curContent.slice(curIndex + tmp.index, endIndex)
-          },
-          innerTag: {
-            start: curIndex + tmp.index + tmp[0].length,
-            end: endResult.start
-          }
-        };
-        data.innerTag.tagContent = this.curContent.slice(
-          data.innerTag.start,
-          data.innerTag.end
-        );
-        result.data.unshift(data);
-      }
-
-      curIndex = nextIndex;
-      if (!matchAll) {
-        break;
-      }
+    // 配置tag的位置
+    let startMatch = startReg.exec(curContent);
+    let endMatch = endRe.exec(curContent);
+    let matchIndexs = []; // tag的位置信息
+    while (startMatch) {
+      matchIndexs.push({
+        type: "start",
+        end: startReg.lastIndex,
+        start: startMatch.index
+      });
+      startMatch = startReg.exec(curContent);
     }
-    return result;
-  }
-  matchEnd(nextIndex, startReg, endReg, tagLength) {
-    let r = { start: 0, end: 0 };
+    while (endMatch) {
+      matchIndexs.push({
+        type: "end",
+        end: endRe.lastIndex,
+        start: endMatch.index
+      });
+      endMatch = endRe.exec(curContent);
+    }
+    matchIndexs.sort((a, b) => a.start - b.start);
 
-    let endContent = this.curContent.slice(nextIndex);
-    let tmpEnd = endContent.match(endReg);
+    // 获取所有匹配tag的数据
+    const tempStack = [];
 
-    if (tmpEnd) {
-      let endMatch = this.curContent.slice(
-        nextIndex,
-        nextIndex + tmpEnd.index + tmpEnd[0].length
-      );
-      let tmpMatch = endMatch.match(startReg);
-      if (tmpMatch) {
-        r = this.matchEnd(
-          nextIndex + tmpEnd.index + tagLength,
-          startReg,
-          endReg,
-          tmpEnd[0].length
-        );
+    matchIndexs.forEach(curEndInfo => {
+      if (curEndInfo.type === "start") {
+        tempStack.push(curEndInfo);
       } else {
-        r.start = nextIndex + tmpEnd.index;
-        r.end = nextIndex + tmpEnd.index + tmpEnd[0].length;
-      }
-    }
+        // 碰到end 队列中最后的start出列
+        const curStartInfo = tempStack.pop();
+        if (tempStack.length === 0 || nesting) {
+          // 匹配到的根tag
+          const { start } = curStartInfo;
+          const { end } = curEndInfo;
 
-    return r;
+          const content = curContent.slice(start, end);
+          result.data.unshift({
+            start,
+            end,
+            content
+          });
+        }
+      }
+    });
+
+    return result;
   }
 };

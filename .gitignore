@@ -26,6 +26,7 @@ yarn-error.log*
 *.sln
 *.sw?
 .vscode
+test/vue
 
 # personal configs
 webpack.config.js

@@ -40,8 +40,7 @@ var _require3 = require("./adapters"),
     completeJsxAttrs = _require3.completeJsxAttrs,
     replaceJsxValue = _require3.replaceJsxValue,
     readUpperCaseNodeName = _require3.readUpperCaseNodeName,
-    filterUpperCaseStr = _require3.filterUpperCaseStr,
-    revertUpperCaseNodeName = _require3.revertUpperCaseNodeName,
+    revertUpperCase = _require3.revertUpperCase,
     transformIgnoreTagOrEmptyTag = _require3.transformIgnoreTagOrEmptyTag;
 
 module.exports = function () {
@@ -71,7 +70,7 @@ module.exports = function () {
       var _this = this;
 
       // 解析readNodes前拦截
-      this.beforeReadNodesFunc = [filterUpperCaseStr];
+      this.beforeReadNodesFunc = [];
       // 解析attrs前的拦截器
       this.beforeAttrsFunc = [completeJsxAttrs, function (val) {
         return transformIgnoreTagOrEmptyTag(_this.ignoretags, val);
@@ -81,7 +80,7 @@ module.exports = function () {
       // 解析内容前的拦截器
       this.beforeProcessFunc = [readUpperCaseNodeName, completeSingleTag];
       // 处理完成后的拦截器
-      this.afterProcessFuns = [deleteIgnoreTagEmptyValue, htmlDecode, revertSingleTag, revertUpperCaseNodeName, replaceJsxValue];
+      this.afterProcessFuns = [deleteIgnoreTagEmptyValue, htmlDecode, revertSingleTag, revertUpperCase, replaceJsxValue];
     }
   }, {
     key: "adapterObs",
@@ -170,7 +169,7 @@ module.exports = function () {
         } else if (this.program.dom) {
           autoUidValue = fullTagPath;
         } else {
-          autoUidValue = Uuid().replace(/-/g, "").slice(0, 12);
+          autoUidValue = Uuid().slice(0, 8);
         }
       }
       // autoUidValue去重
@@ -184,7 +183,7 @@ module.exports = function () {
       }
 
       if (this.autoUid.idprefix) {
-        autoUidValue = this.info.autoUid.idprefix + autoUidValue;
+        autoUidValue = this.autoUid.idprefix + autoUidValue;
       }
 
       this.generateIds[distJsonKey] = autoUidValue;

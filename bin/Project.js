@@ -53,7 +53,6 @@ module.exports = function () {
       }
 
       if (program.target) {
-        console.log(program.target);
         p.changeFiles.push(path.resolve(program.target));
       }
       return p.changeFiles;

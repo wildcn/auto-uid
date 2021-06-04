@@ -4,7 +4,7 @@ const { hasCapital } = require("./utils/str");
 const adapter = {
   tempErrorAttrs: {}, //暂存jsx等引起的解析错误
   upperCaseStrObj: {}, // 暂存所有的驼峰字符串
-
+  perAttrNameReg: "</ \n\r:@",
   // 根据vue eslit 规则为attr排序
   sortAttrsByLintRule(attrs) {
     // eslint vue/attributes-order  https://eslint.vuejs.org/rules/attributes-order.html
@@ -27,33 +27,45 @@ const adapter = {
   },
   // parse5 会将所有的驼峰转换为小写，所以需要先暂存驼峰
   readUpperCaseNodeName(str) {
-    return str.replace(/<[\/]*([a-zA-Z-]+)/g, function(matchStr, $1) {
-      if (hasCapital($1)) {
-        let key = $1.toLowerCase();
-        // parse5遇见table会解析错误
-        if (["table", "input"].indexOf(key) !== "-1") {
-          key = `div-${key}`;
+    return str.replace(
+      new RegExp(`[${adapter.perAttrNameReg}]+([a-zA-Z-]+)`, "g"),
+      (matchStr, $1) => {
+        if (hasCapital($1)) {
+          let key = $1.toLowerCase();
+          // parse5遇见table会解析错误
+          if (["table", "input"].indexOf(key) !== "-1") {
+            key = `div-${key}`;
+          }
+          // adapter.upperCaseStrObj[key] = $1;
+          adapter.upperCaseStrObj[this.relativeFilePath] =
+            adapter.upperCaseStrObj[this.relativeFilePath] || {};
+          adapter.upperCaseStrObj[this.relativeFilePath][key] = $1;
+          return matchStr.replace($1, key);
         }
-        adapter.upperCaseStrObj[key] = $1;
-        return matchStr.replace($1, key);
+        return matchStr;
       }
-      return matchStr;
-    });
+    );
   },
   filterUpperCaseStr(node) {
     const { nodeName } = node;
     // 删除不存在的nodeName Uppercase Cache
-    if (!adapter.upperCaseStrObj[nodeName]) {
-      delete adapter.upperCaseStrObj[nodeName];
+    if (!adapter.upperCaseStrObj[this.relativeFilePath][nodeName]) {
+      delete adapter.upperCaseStrObj[this.relativeFilePath][nodeName];
     }
     return node;
   },
-  revertUpperCaseNodeName(str) {
-    Object.keys(adapter.upperCaseStrObj).forEach(lowerNodeName => {
+  revertUpperCase(str) {
+    const obj = adapter.upperCaseStrObj[this.relativeFilePath] || {};
+    // lang string first
+    const keys = Object.keys(obj).sort((a, b) => b.length - a.length);
+    keys.forEach(lowerNodeName => {
       str = str.replace(
-        new RegExp(`(<[\/]*)(${lowerNodeName})([ >])`, "g"),
+        new RegExp(
+          `([${adapter.perAttrNameReg}]+)(${lowerNodeName})([ >]*)`,
+          "g"
+        ),
         function(matchStr, $1, $2, $3) {
-          return `${$1}${adapter.upperCaseStrObj[lowerNodeName]}${$3}`;
+          return `${$1}${obj[lowerNodeName]}${$3}`;
         }
       );
     });
