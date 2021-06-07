@@ -1,8 +1,24 @@
-# auto-uid
 
+#  1. <a name='auto-uid'></a>auto-uid
 
-[toc]
+<!-- TOC -->
 
+- [使用说明](#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
+- [主要功能点](#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD%E7%82%B9)
+- [适用范围](#%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4)
+- [import 执行模式](#import-%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%BC%8F)
+  - [<a name='Usage'></a>Usage](#a-nameusageausage)
+  - [<a name='Hooks'></a>Hooks](#a-namehooksahooks)
+    - [<a name='beforeReadNodesFuncnodenode'></a>beforeReadNodesFuncnode=>node](#a-namebeforereadnodesfuncnodenodeabeforereadnodesfuncnodenode)
+    - [<a name='beforeAttrsFuncattributeArrayattributeArray'></a>beforeAttrsFuncattributeArray=>attributeArray](#a-namebeforeattrsfuncattributearrayattributearrayabeforeattrsfuncattributearrayattributearray)
+    - [<a name='afterAttrsFuncattributeArrayattributeArray'></a>afterAttrsFuncattributeArray=>attributeArray](#a-nameafterattrsfuncattributearrayattributearrayaafterattrsfuncattributearrayattributearray)
+    - [<a name='beforeProcessFunchtmlContenthtmlContent'></a>beforeProcessFunchtmlContent=>htmlContent](#a-namebeforeprocessfunchtmlcontenthtmlcontentabeforeprocessfunchtmlcontenthtmlcontent)
+    - [<a name='afterProcessFunsparseContentparseContent'></a>afterProcessFunsparseContent=>parseContent](#a-nameafterprocessfunsparsecontentparsecontentaafterprocessfunsparsecontentparsecontent)
+- [命令行模式](#%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%A8%A1%E5%BC%8F)
+- [参数配置文件 auto-uid.config.js](#%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-auto-uidconfigjs)
+  - [<a name='auto-uid.config.js'></a>auto-uid.config.js 说明](#a-nameauto-uidconfigjsaauto-uidconfigjs-%E8%AF%B4%E6%98%8E)
+
+<!-- /TOC -->
 # 使用说明
 
     提交代码自动为标签添加 唯一ID 属性
@@ -26,10 +42,9 @@
 
     *@TODO 后续可支持任意html片段导入
 
+# import 执行模式
 
-# import执行模式
-
-## Usage
+##  2. <a name='Usage'></a>Usage
 
 ```bash
 npm i auto-uid --save-dev
@@ -56,44 +71,55 @@ APP.process(); // 插入uid等操作
 
 APP.realChangeFiles; // 真实改动的文件列表
 
+APP.beforeReadNodesFunc.push(function(nodeData) {
+  log(nodeData);
+  return nodeData;
+});
 ```
 
+##  3. <a name='Hooks'></a>Hooks
 
-## Hooks
-PS. 以下hooks，均在APP.process()过程中生效。
+PS. 以下 hooks，均在 APP.process()过程中生效。
 
-### beforeReadNodesFunc(node)=>node
-读取dom节点前执行
+###  3.1. <a name='beforeReadNodesFuncnodenode'></a>beforeReadNodesFunc(node)=>node
 
-### beforeAttrsFunc(attributeArray)=>attributeArray
-解析dom的attributes前的拦截器
+读取 dom 节点前执行
 
-### afterAttrsFunc(attributeArray)=>attributeArray
-解析attrs完成后的拦截器
+###  3.2. <a name='beforeAttrsFuncattributeArrayattributeArray'></a>beforeAttrsFunc(attributeArray)=>attributeArray
 
-### beforeProcessFunc(htmlContent)=>htmlContent
-解析内容前的拦截器 
+解析 dom 的 attributes 前的拦截器
 
-### afterProcessFuns(parseContent)=>parseContent
-content处理完成后的拦截器
+###  3.3. <a name='afterAttrsFuncattributeArrayattributeArray'></a>afterAttrsFunc(attributeArray)=>attributeArray
+
+解析 attrs 完成后的拦截器
+
+###  3.4. <a name='beforeProcessFunchtmlContenthtmlContent'></a>beforeProcessFunc(htmlContent)=>htmlContent
+
+解析内容前的拦截器
+
+###  3.5. <a name='afterProcessFunsparseContentparseContent'></a>afterProcessFuns(parseContent)=>parseContent
+
+content 处理完成后的拦截器
+
 # 命令行模式
- 一键初始化 (切换到项目根目录, 然后执行以下命令)(执行完这条命令之后以后每次 commit 的时候会自动生成唯一 ID)
+
+一键初始化 (切换到项目根目录, 然后执行以下命令)(执行完这条命令之后以后每次 commit 的时候会自动生成唯一 ID)
 
     sudo npm install -g auto-uid && auto-uid --auto
 
- 安装全局指令
+安装全局指令
 
     sudo npm install -g auto-uid
 
- 设置提交勾子与处理所有文件指令: auto-uid --auto
+设置提交勾子与处理所有文件指令: auto-uid --auto
 
     cd projectRoot && auto-uid --auto
 
     # auto-uid --auto = auto-uid --setup && auto-uid --full
 
- 其他操作
+其他操作
 
- 设置提交勾子指令: auto-uid --setup
+设置提交勾子指令: auto-uid --setup
 
     cd projectRoot && auto-uid --setup
 
@@ -101,43 +127,43 @@ content处理完成后的拦截器
     # 拷贝 auto-uid 模块里的 auto-uid.config.js 到项目根目录
     # 拷贝 auto-uid 模块里的 .huskyrc.json 到项目根目录
 
- 处理所有文件指令: auto-uid --full
+处理所有文件指令: auto-uid --full
 
     cd projectRoot && auto-uid --full
 
     # 处理所有符合条件的文件
 
- 处理指定文件指令: auto-uid --target
+处理指定文件指令: auto-uid --target
 
     cd projectRoot && auto-uid --target ./filepath.vue
 
     # 处理单个指定的文件
 
- 处理指定目录文件指令: auto-uid --dir
+处理指定目录文件指令: auto-uid --dir
 
     cd projectRoot && auto-uid --dir dir
 
     # 处理指定目录下的文件
 
- 更新已经生成的唯一 ID: auto-uid --update
+更新已经生成的唯一 ID: auto-uid --update
 
     auto-uid --full --update
 
     # 通常与 --full 或者 --target 结合使用
 
- 清空 dom 中写入的 uid: auto-uid --clean
+清空 dom 中写入的 uid: auto-uid --clean
 
     auto-uid --full --clean
 
- 使用 dom 结构对应的 uid 代替 uuid: auto-uid --dom
+使用 dom 结构对应的 uid 代替 uuid: auto-uid --dom
 
     auto-uid --full --dom
 
- dom 中写入的 uid: auto-uid --write
+dom 中写入的 uid: auto-uid --write
 
     auto-uid --full --write
 
- 显示帮助指令: auto-uid --help
+显示帮助指令: auto-uid --help
 
     auto-uid --help
 
@@ -147,7 +173,7 @@ content处理完成后的拦截器
 
     如果运行命令的项目根目录有 auto-uid.config.js，工具会自动读取配置参数
 
-## auto-uid.config.js 说明
+##  4. <a name='auto-uid.config.js'></a>auto-uid.config.js 说明
 
     {
         "extension": [ 'vue' ]              //需要处理的文件后缀名
@@ -162,5 +188,3 @@ content处理完成后的拦截器
         //忽略处理的标签名
         , "ignoretag": [ "v-hover", "template","v-else", "el-table-column" ]
     }
-
-
