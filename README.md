@@ -3,6 +3,7 @@
 
 <!-- TOC -->
 
+- [<a name='auto-uid'></a>auto-uid](#a-nameauto-uidaauto-uid)
 - [使用说明](#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E)
 - [主要功能点](#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD%E7%82%B9)
 - [适用范围](#%E9%80%82%E7%94%A8%E8%8C%83%E5%9B%B4)
@@ -24,22 +25,19 @@
     提交代码自动为标签添加 唯一ID 属性
 
     解决疼点：UI 自动化测试时，页面上标签的标识变更导致UI测试用例需要重写, auto-uid 主要为了减少ID变更造成的影响
+    PS. 如使用webpack构建项目，可配合[webpack-plugin-auto-uid](https://www.npmjs.com/package/webpack-plugin-auto-uid)使用。
 
 # 主要功能点
 
-- 基于 parse5 解析代码块
-- 可配置不侵入源码，而在编译流程中加入 uid
+- 自动在DOM中生成auto-uid
 - 支持生成 uid 对应的 map 表，并可自定义任意的 uid
-- 支持写入和清空
 - 可根据 dom 结构生成语义化的 uid
 - 支持修改配置文件自定义 uid
 
 # 适用范围
 
     * 使用 npm package.json 安装依赖的前端项目
-
     * 使用 vue 框架的前端项目
-
     *@TODO 后续可支持任意html片段导入
 
 # import 执行模式
