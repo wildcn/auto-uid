@@ -52,6 +52,7 @@ module.exports = function () {
     this.ignoretags = root.info.autoUid.ignoretag;
     this.autoUid = root.info.autoUid;
     this.relativeFilePath = root.curFilepath.replace(new RegExp(process.cwd()), "");
+    logInfo(process.cwd());
     this.program = root.app.program;
     this.attrname = root.info.autoUid.attrname;
     this.generateIds = this.distJson[this.relativeFilePath] || {}; // 所有生成的id
@@ -157,7 +158,6 @@ module.exports = function () {
         return (0, _assign2.default)(res, (0, _defineProperty3.default)({}, item.name, item.value));
       }, {});
       var distJsonKey = fullTagPath + "_" + index;
-
       // 读文件配置ID 或dom本身已存在ID
       var autoUidValue = this.generateIds[distJsonKey] || attrNamesObj[this.attrname];
       if (!autoUidValue || this.program.update) {
@@ -183,7 +183,7 @@ module.exports = function () {
       }
 
       if (this.autoUid.idprefix) {
-        autoUidValue = this.autoUid.idprefix + autoUidValue;
+        autoUidValue = this.autoUid.idprefix + autoUidValue.replace(new RegExp('^' + this.autoUid.idprefix, 'g'), '');
       }
 
       this.generateIds[distJsonKey] = autoUidValue;

@@ -16,7 +16,7 @@ module.exports = class Project {
     let p = this;
     let program = this.program || this.app.program || {};
     if (program.full || program.clean) {
-      p.info.autoUid.dir.map(item => {
+    p.info.autoUid.dir.map(item => {
         let globRe = `${
           p.info.projectRoot
         }/${item}/**/*.+(${p.info.autoUid.extension.join("|")})`;
