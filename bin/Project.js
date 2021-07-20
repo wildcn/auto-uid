@@ -1,5 +1,9 @@
 "use strict";
 
+var _values = require("babel-runtime/core-js/object/values");
+
+var _values2 = _interopRequireDefault(_values);
+
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -25,6 +29,7 @@ module.exports = function () {
     this.app = app;
     this.info = this.app.projectInfo;
     this.changeFiles = [];
+    this.files = {};
     this.info.autoUid.dir.map(function (item, index) {
       _this.info.autoUid.dir[index] = item.replace(/[\/]+$/, "");
     });
@@ -38,23 +43,30 @@ module.exports = function () {
       logInfo("getChangeFiles");
       var p = this;
       var program = this.program || this.app.program || {};
+      var cwd = process.cwd();
       if (program.full || program.clean) {
         p.info.autoUid.dir.map(function (item) {
-          var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.autoUid.extension.join("|") + ")";
-          p.changeFiles = p.changeFiles.concat(glob.sync(globRe, {}));
+          var relativeGlobReg = item + "/**/*.+(" + p.info.autoUid.extension.join("|") + ")";
+          glob.sync(relativeGlobReg, {}).forEach(function (relativeFilePath) {
+            p.files[relativeFilePath] = path.resolve(cwd, relativeFilePath);
+          });
         });
       }
 
       if (program.dir) {
         program.dir.split(",").map(function (item) {
-          var globRe = p.info.projectRoot + "/" + item + "/**/*.+(" + p.info.autoUid.extension.join("|") + ")";
-          p.changeFiles = p.changeFiles.concat(glob.sync(globRe, {}));
+          var relativeGlobReg = item + "/**/*.+(" + p.info.autoUid.extension.join("|") + ")";
+          glob.sync(relativeGlobReg, {}).forEach(function (relativeFilePath) {
+            p.files[relativeFilePath] = path.resolve(cwd, relativeFilePath);
+          });
         });
       }
 
-      if (program.target) {
-        p.changeFiles.push(path.resolve(program.target));
+      if (program.target && fs.existsSync(path.resolve(cwd, program.target))) {
+        p.files[program.target] = path.resolve(cwd, program.target);
       }
+      logInfo(p.files);
+      p.changeFiles = (0, _values2.default)(p.files);
       return p.changeFiles;
     }
   }]);

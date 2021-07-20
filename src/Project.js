@@ -6,6 +6,7 @@ module.exports = class Project {
     this.app = app;
     this.info = this.app.projectInfo;
     this.changeFiles = [];
+    this.files = {};
     this.info.autoUid.dir.map((item, index) => {
       this.info.autoUid.dir[index] = item.replace(/[\/]+$/, "");
     });
@@ -15,27 +16,30 @@ module.exports = class Project {
     logInfo("getChangeFiles");
     let p = this;
     let program = this.program || this.app.program || {};
+    let cwd = process.cwd();
     if (program.full || program.clean) {
     p.info.autoUid.dir.map(item => {
-        let globRe = `${
-          p.info.projectRoot
-        }/${item}/**/*.+(${p.info.autoUid.extension.join("|")})`;
-        p.changeFiles = p.changeFiles.concat(glob.sync(globRe, {}));
+      let relativeGlobReg = `${item}/**/*.+(${p.info.autoUid.extension.join("|")})`;
+      glob.sync(relativeGlobReg, {}).forEach(relativeFilePath=>{
+        p.files[relativeFilePath] = path.resolve(cwd,relativeFilePath);
+      });
       });
     }
 
     if (program.dir) {
       program.dir.split(",").map(item => {
-        let globRe = `${
-          p.info.projectRoot
-        }/${item}/**/*.+(${p.info.autoUid.extension.join("|")})`;
-        p.changeFiles = p.changeFiles.concat(glob.sync(globRe, {}));
+        let relativeGlobReg = `${item}/**/*.+(${p.info.autoUid.extension.join("|")})`;
+        glob.sync(relativeGlobReg, {}).forEach(relativeFilePath=>{
+          p.files[relativeFilePath] = path.resolve(cwd,relativeFilePath);
+        });
       });
     }
 
-    if (program.target) {
-      p.changeFiles.push(path.resolve(program.target));
+    if (program.target && fs.existsSync(path.resolve(cwd,program.target))) {
+      p.files[program.target] = path.resolve(cwd,program.target);
     }
+    logInfo(p.files)
+    p.changeFiles = Object.values(p.files);
     return p.changeFiles;
   }
 };

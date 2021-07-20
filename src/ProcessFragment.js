@@ -25,10 +25,10 @@ module.exports = class ProcessFragment {
     this.distJson = root.distJson;
     this.ignoretags = root.info.autoUid.ignoretag;
     this.autoUid = root.info.autoUid;
-    this.relativeFilePath = root.curFilepath.replace(
-      new RegExp(process.cwd()),
-      ""
-    );
+    // 生成abs:relative的对象
+    this.absFilesObj = Object.entries(root.files).reduce((res,item)=>Object.assign(res,{[item[1]]:item[0]}),{})
+    // 获取文件的相对路径
+    this.relativeFilePath = this.absFilesObj[root.curFilepath];
     logInfo(process.cwd())
     this.program = root.app.program;
     this.attrname = root.info.autoUid.attrname;
@@ -39,6 +39,7 @@ module.exports = class ProcessFragment {
     // adapter
     this.registerAdapter();
   }
+ 
   // 注册拦截器 拦截器内的this会被重定向
   registerAdapter() {
     // 解析readNodes前拦截

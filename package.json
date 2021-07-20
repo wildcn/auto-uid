@@ -7,7 +7,7 @@
     "auto-uid": "bin/main.js"
   },
   "scripts": {
-    "test": "babel-node src/main.js -t test/t2.vue -W",
+    "test": "babel-node src/main.js -r test -W",
     "dir": "babel-node src/main.js -r views/ -W",
     "only-test": "babel-node src/main.js",
     "test-import": "babel-node test/index.js",

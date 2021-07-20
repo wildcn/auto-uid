@@ -25,7 +25,6 @@ var merge = require("deepmerge");
 
 var APP_ROOT = path.resolve(__dirname, "..");
 var PROJECT_ROOT = process.env.PWD || process.cwd();
-
 var packJSON = require(APP_ROOT + "/package.json");
 var config = require(APP_ROOT + "/auto-uid.config.js");
 var compareVersions = require("compare-versions");

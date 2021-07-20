@@ -10,7 +10,6 @@ const merge = require("deepmerge");
 
 const APP_ROOT = path.resolve(__dirname, "..");
 let PROJECT_ROOT = process.env.PWD || process.cwd();
-logInfo(PROJECT_ROOT)
 const packJSON = require(`${APP_ROOT}/package.json`);
 const config = require(`${APP_ROOT}/auto-uid.config.js`);
 const compareVersions = require("compare-versions");
@@ -52,7 +51,6 @@ class Run {
     }
 
     this.PROJECT_ROOT = program.path || PROJECT_ROOT;
-    console.log('%cthis.PROJECT_ROOT: ', 'color: MidnightBlue; background: Aquamarine;', this.PROJECT_ROOT);
 
     let projectInfo = this.resolveProjectInfo(this.PROJECT_ROOT);
     this.resolveConfig(projectInfo);

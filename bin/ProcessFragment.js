@@ -12,6 +12,10 @@ var _assign = require("babel-runtime/core-js/object/assign");
 
 var _assign2 = _interopRequireDefault(_assign);
 
+var _entries = require("babel-runtime/core-js/object/entries");
+
+var _entries2 = _interopRequireDefault(_entries);
+
 var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -51,7 +55,12 @@ module.exports = function () {
     this.distJson = root.distJson;
     this.ignoretags = root.info.autoUid.ignoretag;
     this.autoUid = root.info.autoUid;
-    this.relativeFilePath = root.curFilepath.replace(new RegExp(process.cwd()), "");
+    // 生成abs:relative的对象
+    this.absFilesObj = (0, _entries2.default)(root.files).reduce(function (res, item) {
+      return (0, _assign2.default)(res, (0, _defineProperty3.default)({}, item[1], item[0]));
+    }, {});
+    // 获取文件的相对路径
+    this.relativeFilePath = this.absFilesObj[root.curFilepath];
     logInfo(process.cwd());
     this.program = root.app.program;
     this.attrname = root.info.autoUid.attrname;
@@ -62,6 +71,7 @@ module.exports = function () {
     // adapter
     this.registerAdapter();
   }
+
   // 注册拦截器 拦截器内的this会被重定向
 
 
