@@ -1,5 +1,17 @@
 "use strict";
 
+var _defineProperty2 = require("babel-runtime/helpers/defineProperty");
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _assign = require("babel-runtime/core-js/object/assign");
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _entries = require("babel-runtime/core-js/object/entries");
+
+var _entries2 = _interopRequireDefault(_entries);
+
 var _values = require("babel-runtime/core-js/object/values");
 
 var _values2 = _interopRequireDefault(_values);
@@ -30,6 +42,7 @@ module.exports = function () {
     this.info = this.app.projectInfo;
     this.changeFiles = [];
     this.files = {};
+    this.absFilesObj = {};
     this.info.autoUid.dir.map(function (item, index) {
       _this.info.autoUid.dir[index] = item.replace(/[\/]+$/, "");
     });
@@ -67,6 +80,9 @@ module.exports = function () {
       }
       logInfo(p.files);
       p.changeFiles = (0, _values2.default)(p.files);
+      p.absFilesObj = (0, _entries2.default)(p.files).reduce(function (res, item) {
+        return (0, _assign2.default)(res, (0, _defineProperty3.default)({}, item[1], item[0]));
+      }, {});
       return p.changeFiles;
     }
   }]);

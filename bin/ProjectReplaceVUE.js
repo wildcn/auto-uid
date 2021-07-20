@@ -124,7 +124,7 @@ module.exports = function (_Project) {
           fs.writeFileSync(filepath, _this2.tagInfo.newContent, {
             encoding: _this2.info.autoUid.encoding || "utf8"
           });
-          _this2.realChangeFiles.push(filepath);
+          _this2.realChangeFiles.push(p.absFilesObj[filepath]);
         }
       });
       if ((0, _stringify2.default)(this.distJson) !== this.distJsonCache) {

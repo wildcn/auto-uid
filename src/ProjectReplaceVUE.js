@@ -87,7 +87,7 @@ module.exports = class ProjectReplaceVUE extends Project {
         fs.writeFileSync(filepath, this.tagInfo.newContent, {
           encoding: this.info.autoUid.encoding || "utf8"
         });
-        this.realChangeFiles.push(filepath);
+        this.realChangeFiles.push(p.absFilesObj[filepath]);
       }
     });
     if (JSON.stringify(this.distJson) !== this.distJsonCache) {

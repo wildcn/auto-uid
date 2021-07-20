@@ -7,6 +7,7 @@ module.exports = class Project {
     this.info = this.app.projectInfo;
     this.changeFiles = [];
     this.files = {};
+    this.absFilesObj = {};
     this.info.autoUid.dir.map((item, index) => {
       this.info.autoUid.dir[index] = item.replace(/[\/]+$/, "");
     });
@@ -40,6 +41,7 @@ module.exports = class Project {
     }
     logInfo(p.files)
     p.changeFiles = Object.values(p.files);
+    p.absFilesObj = Object.entries(p.files).reduce((res,item)=>Object.assign(res,{[item[1]]:item[0]}),{})
     return p.changeFiles;
   }
 };
